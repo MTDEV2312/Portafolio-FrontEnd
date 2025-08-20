@@ -1,5 +1,5 @@
 // Servicios específicos para el panel de administración
-const ADMIN_API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const ADMIN_API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://backend-portafolio-q0ig.onrender.com/api';
 
 export interface AdminAuthResponse {
   success: boolean;

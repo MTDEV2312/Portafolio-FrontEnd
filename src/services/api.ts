@@ -1,5 +1,5 @@
 // Configuración de la API para SSG
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://backend-portafolio-q0ig.onrender.com/api';
 
 // Variable global para rastrear el estado de la API
 let apiStatus: 'unknown' | 'available' | 'unavailable' = 'unknown';
