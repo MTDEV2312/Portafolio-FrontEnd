@@ -7,7 +7,6 @@
     "build": "astro check && astro build",
     "build:production": "node build-production.js",
     "build:ssg": "astro check && astro build",
-    "build:with-backend": "./build-ssg.bat",
     "start": "astro preview",
     "preview": "astro preview",
     "preview:build": "npm run build && npm run preview",
