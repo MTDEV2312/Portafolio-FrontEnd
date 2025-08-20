@@ -1,0 +1,270 @@
+---
+import Logo from '../components/Logo.astro';
+---
+
+<nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-card/95 border-b-2 border-primary/20 shadow-xl" role="navigation" aria-label="Navegación principal">
+  <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#home" class="flex items-center gap-3 group">
+      <Logo size="md" />
+      <span class="text-card-foreground font-bold text-2xl tracking-wider">Mathías Terán</span>
+    </a>
+    
+    <!-- Desktop Menu -->
+    <div class="hidden md:block">
+      <ul class="flex gap-x-8 text-lg font-semibold">
+        <li>
+          <a href="#home" class="text-card-foreground hover:text-primary transition-colors duration-300 relative group">
+            Home
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#about" class="text-card-foreground hover:text-primary transition-colors duration-300 relative group">
+            About
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#projects" class="text-card-foreground hover:text-primary transition-colors duration-300 relative group">
+            Projects
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#contact" class="text-card-foreground hover:text-primary transition-colors duration-300 relative group">
+            Contact
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Mobile menu button -->
+    <button 
+      id="mobile-menu-button"
+      class="md:hidden focus:outline-none text-card-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-primary/10 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card" 
+      aria-label="Abrir o cerrar menú de navegación"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <!-- Hamburger Icon -->
+      <svg id="hamburger-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <!-- Close Icon -->
+      <svg id="close-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  
+  <!-- Mobile Menu -->
+  <div 
+    id="mobile-menu" 
+    class="md:hidden fixed top-0 left-0 w-full h-screen bg-card/95 backdrop-blur-sm z-40 transform -translate-x-full transition-transform duration-300 ease-in-out" 
+    inert
+  >
+    <!-- Overlay para cerrar al hacer click fuera -->
+    <div class="absolute inset-0 bg-primary/20" id="mobile-menu-overlay"></div>
+    
+    <!-- Contenido del menú -->
+    <div class="relative bg-card w-80 h-full shadow-2xl border-r-2 border-primary/20">
+      <!-- Header del menú móvil -->
+      <div class="flex items-center justify-between p-6 border-b-2 border-border">
+        <div class="flex items-center gap-3">
+          <Logo size="md" className="!h-10 !w-10" />
+          <span class="text-card-foreground font-bold text-xl">Menú</span>
+        </div>
+        <button 
+          id="mobile-menu-close"
+          class="text-card-foreground hover:text-primary p-2 rounded-lg hover:bg-primary/10 transition-colors duration-300"
+          aria-label="Cerrar menú"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Lista de navegación -->
+      <div class="p-6">
+        <ul class="flex flex-col space-y-3 text-lg font-semibold">
+          <li>
+            <a href="#home" class="flex items-center gap-4 py-4 px-4 text-card-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-300 mobile-menu-link">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="#about" class="flex items-center gap-4 py-4 px-4 text-card-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-300 mobile-menu-link">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+              <span>About</span>
+            </a>
+          </li>
+          <li>
+            <a href="#projects" class="flex items-center gap-4 py-4 px-4 text-card-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-300 mobile-menu-link">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="#contact" class="flex items-center gap-4 py-4 px-4 text-primary-foreground hover:text-accent hover:bg-accent/10 rounded-lg transition-all duration-300 mobile-menu-link">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span>Contact</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Footer del menú móvil -->
+      <div class="absolute bottom-6 left-6 right-6">
+        <div class="text-center text-accent text-sm">
+          <p>Mathías Terán</p>
+          <p class="text-xs opacity-75">FullStack Developer</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Funcionalidad del menú móvil
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuClose = document.getElementById('mobile-menu-close');
+  const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+  const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+  
+  let isMenuOpen = false;
+
+  function toggleMobileMenu() {
+    isMenuOpen = !isMenuOpen;
+    
+    if (isMenuOpen) {
+      // Abrir menú
+      mobileMenu?.classList.remove('-translate-x-full');
+      mobileMenu?.classList.add('translate-x-0');
+      mobileMenu?.removeAttribute('inert');
+      mobileMenuButton?.setAttribute('aria-expanded', 'true');
+      hamburgerIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+      
+      // Prevenir scroll del body cuando el menú está abierto
+      document.body.style.overflow = 'hidden';
+      
+      // Enfocar el primer enlace del menú para accesibilidad
+      setTimeout(() => {
+        const firstLink = mobileMenu?.querySelector('.mobile-menu-link') as HTMLElement;
+        firstLink?.focus();
+      }, 100);
+    } else {
+      // Cerrar menú
+      mobileMenu?.classList.add('-translate-x-full');
+      mobileMenu?.classList.remove('translate-x-0');
+      mobileMenu?.setAttribute('inert', '');
+      mobileMenuButton?.setAttribute('aria-expanded', 'false');
+      hamburgerIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      
+      // Restaurar scroll del body
+      document.body.style.overflow = '';
+      
+      // Devolver el foco al botón del menú
+      mobileMenuButton?.focus();
+    }
+  }
+
+  // Event listeners para abrir/cerrar menú
+  mobileMenuButton?.addEventListener('click', toggleMobileMenu);
+  mobileMenuClose?.addEventListener('click', toggleMobileMenu);
+  mobileMenuOverlay?.addEventListener('click', toggleMobileMenu);
+
+  // Cerrar menú al hacer click en un enlace
+  mobileMenuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (isMenuOpen) {
+        toggleMobileMenu();
+      }
+    });
+  });
+
+  // Cerrar menú al cambiar tamaño de ventana a desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768 && isMenuOpen) {
+      toggleMobileMenu();
+    }
+  });
+
+  // Cerrar menú con tecla Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMenuOpen) {
+      toggleMobileMenu();
+    }
+    
+    // Navegación por teclado dentro del menú móvil
+    if (isMenuOpen && (e.key === 'Tab' || e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      const focusableElements = mobileMenu?.querySelectorAll(
+        'button, a, [tabindex]:not([tabindex="-1"])'
+      ) as NodeListOf<HTMLElement>;
+      
+      if (focusableElements && focusableElements.length > 0) {
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const currentIndex = Array.from(focusableElements).indexOf(document.activeElement as HTMLElement);
+        
+        if (e.key === 'Tab') {
+          // Comportamiento normal del Tab, pero contenido dentro del menú
+          if (e.shiftKey) {
+            // Shift + Tab - ir hacia atrás
+            if (document.activeElement === firstElement) {
+              e.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            // Tab - ir hacia adelante
+            if (document.activeElement === lastElement) {
+              e.preventDefault();
+              firstElement.focus();
+            }
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const nextIndex = currentIndex < focusableElements.length - 1 ? currentIndex + 1 : 0;
+          focusableElements[nextIndex].focus();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : focusableElements.length - 1;
+          focusableElements[prevIndex].focus();
+        }
+      }
+    }
+  });
+
+  // Smooth scroll para los enlaces de navegación
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = anchor.getAttribute('href');
+      if (href) {
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colores principales con mejor contraste */
+  --color-primary: #0c2443;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #1a4268;
+  --color-secondary-foreground: #f8fafc;
+  
+  /* Mejorado el contraste del accent */
+  --color-accent: #d4c4b0;
+  --color-accent-foreground: #1a1a1a;
+  
+  --color-tertiary: #8b5a2b;
+  --color-tertiary-foreground: #ffffff;
+  
+  --color-quaternary: #532314;
+  --color-quaternary-foreground: #ffffff;
+  
+  /* Colores adicionales para mejor contraste */
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #475569;
+  
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  
+  --color-border: #e2e8f0;
+  --color-input: #ffffff;
+  
+  /* Colores de estado con buen contraste */
+  --color-success: #16a34a;
+  --color-success-foreground: #ffffff;
+  
+  --color-warning: #d97706;
+  --color-warning-foreground: #ffffff;
+  
+  --color-error: #dc2626;
+  --color-error-foreground: #ffffff;
+  
+  /* Nombres descriptivos actualizados */
+  --color-dark-blue: #0c2443;
+  --color-medium-blue: #1a4268;
+  --color-light-beige: #d4c4b0;
+  --color-brown: #8b5a2b;
+  --color-dark-brown: #532314;
+  
+  /* Colores específicos para el logo con contraste */
+  --color-logo-bg-light: #ffffff;
+  --color-logo-text-light: #0c2443;
+  --color-logo-bg-dark: #1a4268;
+  --color-logo-text-dark: #d4c4b0;
+}
+
+/* Estilos para el logo con mejor visibilidad */
+.logo-container {
+  background: var(--color-logo-bg-light);
+  color: var(--color-logo-text-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-container {
+    background: var(--color-logo-bg-dark);
+    color: var(--color-logo-text-dark);
+  }
+}

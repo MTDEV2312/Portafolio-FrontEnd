@@ -1,0 +1,115 @@
+---
+import { getProfile, fallbackProfile, type Profile } from '../services/api.ts';
+
+// Obtener perfil desde la API en tiempo de build (SSG)
+let profile: Profile;
+
+try {
+  // Intentar obtener datos del backend
+  const apiProfile = await getProfile();
+  
+  if (!apiProfile) {
+    console.log('⚠️ No se encontró perfil desde la API, usando datos de fallback');
+    profile = fallbackProfile;
+  } else {
+    console.log('✅ Perfil obtenido desde la API');
+    profile = apiProfile;
+  }
+} catch (error) {
+  console.error('❌ Error al obtener perfil:', error);
+  profile = fallbackProfile;
+}
+---
+
+<section id="about" class="py-16 px-6 relative">
+    <!-- Fondo para mejorar contraste -->
+    <div class="absolute inset-0 bg-card/95 backdrop-blur-sm"></div>
+    
+    <div class="relative z-10 max-w-6xl mx-auto">
+        <!-- Título principal -->
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-8 text-primary">About Me</h2>
+        
+        <!-- Descripción -->
+        <div class="mb-12">
+            <div class="bg-muted/50 p-8 rounded-xl border border-border">
+                <p class="text-center mx-auto max-w-3xl text-lg text-card-foreground leading-relaxed">
+                    {profile.aboutMeDescription}
+                </p>
+            </div>
+        </div>
+
+        <!-- Tecnologías -->
+        <div class="space-y-12">
+            <h3 class="text-3xl md:text-4xl font-bold text-center text-secondary">Tecnologías</h3>
+            
+            <!-- Web Technologies -->
+            <div class="bg-card border-2 border-primary/20 rounded-xl p-6 shadow-lg">
+                <h4 class="text-center mb-6 text-2xl font-bold text-primary">Web</h4>
+                <div class="flex items-center justify-center gap-8 md:gap-12">
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-primary-foreground font-bold text-lg">V</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">Vite</span>
+                    </div>
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-tertiary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-tertiary-foreground font-bold text-lg">R</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">React</span>
+                    </div>
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-quaternary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-quaternary-foreground font-bold text-lg">N</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">Node.js</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database -->
+            <div class="bg-card border-2 border-tertiary/20 rounded-xl p-6 shadow-lg">
+                <h4 class="text-center mb-6 text-2xl font-bold text-tertiary">Database</h4>
+                <div class="flex items-center justify-center gap-8 md:gap-12">
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-primary-foreground font-bold text-sm">SQL</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">MySQL</span>
+                    </div>
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-quaternary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-quaternary-foreground font-bold text-lg">M</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">MongoDB</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programming Languages -->
+            <div class="bg-card border-2 border-secondary/20 rounded-xl p-6 shadow-lg">
+                <h4 class="text-center mb-6 text-2xl font-bold text-secondary">Programming Languages</h4>
+                <div class="flex items-center justify-center gap-8 md:gap-12">
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-tertiary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-tertiary-foreground font-bold text-lg">JS</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">JavaScript</span>
+                    </div>
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-primary-foreground font-bold text-lg">PY</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">Python</span>
+                    </div>
+                    <div class="flex flex-col items-center space-y-2 group cursor-pointer">
+                        <div class="w-16 h-16 bg-quaternary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <span class="text-quaternary-foreground font-bold text-lg">J</span>
+                        </div>
+                        <span class="text-sm text-card-foreground font-medium">Java</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

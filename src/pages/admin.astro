@@ -1,0 +1,958 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .section {
+            display: block;
+        }
+        .section.hidden {
+            display: none !important;
+        }
+        .nav-btn.active {
+            background-color: rgb(var(--primary)) !important;
+            color: rgb(var(--primary-foreground)) !important;
+        }
+    </style>
+    
+    <div class="min-h-screen bg-gradient-to-br from-primary via-secondary to-tertiary">
+        <!-- Header -->
+        <div class="bg-card/95 backdrop-blur-sm border-b border-border shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-primary rounded-lg">
+                            <i class="fas fa-cog text-primary-foreground text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-primary">Panel de Administración</h1>
+                            <p class="text-muted-foreground">Gestiona tu portfolio de manera fácil y eficiente</p>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="hidden bg-error text-error-foreground px-4 py-2 rounded-lg hover:bg-error/90 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Section -->
+        <div id="auth-section" class="max-w-md mx-auto mt-20 px-4">
+            <div class="bg-card rounded-2xl shadow-xl border border-border p-8">
+                <div class="text-center mb-8">
+                    <div class="p-3 bg-primary/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-lock text-primary text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-card-foreground">Iniciar Sesión</h2>
+                    <p class="text-muted-foreground mt-2">Accede al panel de administración</p>
+                </div>
+                
+                <div id="login-error" class="hidden bg-error/10 border border-error/20 text-error rounded-lg p-4 mb-6">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="login-error-text"></span>
+                    </div>
+                </div>
+                
+                <div id="login-success" class="hidden bg-success/10 border border-success/20 text-success rounded-lg p-4 mb-6">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="login-success-text"></span>
+                    </div>
+                </div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-card-foreground mb-2">Email</label>
+                        <input type="email" id="email" required 
+                               class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-card-foreground mb-2">Contraseña</label>
+                        <input type="password" id="password" required 
+                               class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Iniciar Sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-card rounded-2xl shadow-lg border border-border p-6 sticky top-8">
+                        <h3 class="text-lg font-semibold text-card-foreground mb-6">Navegación</h3>
+                        <nav class="space-y-2">
+                            <button class="nav-btn active w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center space-x-3 bg-primary text-primary-foreground" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </button>
+                            <button class="nav-btn w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center space-x-3 text-muted-foreground hover:bg-muted hover:text-card-foreground" data-section="profile">
+                                <i class="fas fa-user"></i>
+                                <span>Perfil</span>
+                            </button>
+                            <button class="nav-btn w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center space-x-3 text-muted-foreground hover:bg-muted hover:text-card-foreground" data-section="projects">
+                                <i class="fas fa-folder"></i>
+                                <span>Proyectos</span>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Dashboard -->
+                    <div id="dashboard" class="section">
+                        <div class="bg-card rounded-2xl shadow-lg border border-border p-8">
+                            <h2 class="text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
+                                <i class="fas fa-tachometer-alt text-primary"></i>
+                                <span>Dashboard</span>
+                            </h2>
+                            <div class="loading text-center py-12">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                                <p class="text-muted-foreground">Cargando estadísticas...</p>
+                            </div>
+                            <div id="stats" class="hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="bg-gradient-to-r from-primary to-secondary text-primary-foreground p-6 rounded-xl">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 id="total-projects" class="text-3xl font-bold">0</h3>
+                                                <p class="text-primary-foreground/80">Proyectos Totales</p>
+                                            </div>
+                                            <i class="fas fa-folder text-4xl text-primary-foreground/60"></i>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gradient-to-r from-success to-success/80 text-success-foreground p-6 rounded-xl">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h3 id="profile-status" class="text-xl font-semibold">No configurado</h3>
+                                                <p class="text-success-foreground/80">Estado del Perfil</p>
+                                            </div>
+                                            <i class="fas fa-user text-4xl text-success-foreground/60"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Section -->
+                    <div id="profile" class="section hidden">
+                        <div class="bg-card rounded-2xl shadow-lg border border-border p-8">
+                            <h2 class="text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
+                                <i class="fas fa-user text-primary"></i>
+                                <span>Gestión de Perfil</span>
+                            </h2>
+                            
+                            <!-- Messages -->
+                            <div id="profile-error" class="hidden bg-error/10 border border-error/20 text-error rounded-lg p-4 mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span id="profile-error-text"></span>
+                                </div>
+                            </div>
+                            
+                            <div id="profile-success" class="hidden bg-success/10 border border-success/20 text-success rounded-lg p-4 mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="profile-success-text"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Profile Display -->
+                            <div id="current-profile" class="hidden bg-muted rounded-xl p-6 mb-8">
+                                <h3 class="text-lg font-semibold text-card-foreground mb-4">Perfil Actual</h3>
+                                <div id="profile-display" class="space-y-2 text-muted-foreground"></div>
+                            </div>
+
+                            <!-- Profile Form -->
+                            <form id="profile-form" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="nombre" class="block text-sm font-medium text-card-foreground mb-2">Nombre</label>
+                                        <input type="text" id="nombre" required 
+                                               class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                    </div>
+                                    <div>
+                                        <label for="contactEmail" class="block text-sm font-medium text-card-foreground mb-2">Email de Contacto</label>
+                                        <input type="email" id="contactEmail" required 
+                                               class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="perfilUrl" class="block text-sm font-medium text-card-foreground mb-2">URL de Imagen de Perfil</label>
+                                    <input type="url" id="perfilUrl" required 
+                                           class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                    <p class="text-xs text-muted-foreground mt-1">Ingresa la URL de tu imagen de perfil</p>
+                                </div>
+                                <div>
+                                    <label for="aboutMeDescription" class="block text-sm font-medium text-card-foreground mb-2">Descripción About Me</label>
+                                    <textarea id="aboutMeDescription" rows="5" required 
+                                              class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input resize-none"></textarea>
+                                </div>
+                                <button type="submit" class="bg-success text-success-foreground py-3 px-6 rounded-lg hover:bg-success/90 transition-colors font-medium flex items-center space-x-2">
+                                    <i class="fas fa-save"></i>
+                                    <span>Guardar Perfil</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Projects Section -->
+                    <div id="projects" class="section hidden">
+                        <div class="bg-card rounded-2xl shadow-lg border border-border p-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-card-foreground flex items-center space-x-3">
+                                    <i class="fas fa-folder text-primary"></i>
+                                    <span>Gestión de Proyectos</span>
+                                </h2>
+                                <button id="new-project-btn" class="bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Nuevo Proyecto</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Messages -->
+                            <div id="projects-error" class="hidden bg-error/10 border border-error/20 text-error rounded-lg p-4 mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span id="projects-error-text"></span>
+                                </div>
+                            </div>
+                            
+                            <div id="projects-success" class="hidden bg-success/10 border border-success/20 text-success rounded-lg p-4 mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="projects-success-text"></span>
+                                </div>
+                            </div>
+
+                            <!-- Project Form -->
+                            <div id="project-form-container" class="hidden bg-muted/50 border-2 border-dashed border-border rounded-xl p-6 mb-8">
+                                <h3 id="project-form-title" class="text-xl font-semibold text-card-foreground mb-6">Nuevo Proyecto</h3>
+                                <form id="project-form" class="space-y-6">
+                                    <input type="hidden" id="project-id">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="project-title" class="block text-sm font-medium text-card-foreground mb-2">Título</label>
+                                            <input type="text" id="project-title" required 
+                                                   class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                        </div>
+                                        <div>
+                                            <label for="project-image" class="block text-sm font-medium text-card-foreground mb-2">Imagen del Proyecto</label>
+                                            <input type="file" id="project-image" accept="image/*" required 
+                                                   class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90">
+                                            <p class="text-xs text-muted-foreground mt-1">Formatos aceptados: JPG, PNG, GIF, WebP</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="project-description" class="block text-sm font-medium text-card-foreground mb-2">Descripción</label>
+                                        <textarea id="project-description" rows="4" required 
+                                                  class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input resize-none"></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="project-tech" class="block text-sm font-medium text-card-foreground mb-2">Tecnologías</label>
+                                        <input type="text" id="project-tech" placeholder="React, Node.js, MongoDB, TypeScript" required 
+                                               class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                        <p class="text-xs text-muted-foreground mt-1">Separa las tecnologías con comas. Ejemplo: React, Node.js, MongoDB</p>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="project-github" class="block text-sm font-medium text-card-foreground mb-2">GitHub Link (opcional)</label>
+                                            <input type="url" id="project-github" 
+                                                   class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                        </div>
+                                        <div>
+                                            <label for="project-demo" class="block text-sm font-medium text-card-foreground mb-2">Demo Link (opcional)</label>
+                                            <input type="url" id="project-demo" 
+                                                   class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <button type="submit" class="bg-success text-success-foreground py-3 px-6 rounded-lg hover:bg-success/90 transition-colors font-medium flex items-center space-x-2">
+                                            <i class="fas fa-save"></i>
+                                            <span>Guardar Proyecto</span>
+                                        </button>
+                                        <button type="button" id="cancel-project" class="bg-error text-error-foreground py-3 px-6 rounded-lg hover:bg-error/90 transition-colors font-medium flex items-center space-x-2">
+                                            <i class="fas fa-times"></i>
+                                            <span>Cancelar</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Projects List -->
+                            <div id="projects-list">
+                                <div class="text-center py-12">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                                    <p class="text-muted-foreground">Cargando proyectos...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de la API
+        const API_BASE_URL = '/api';
+        let authToken = localStorage.getItem('authToken');
+
+        // Declarar funciones globales primero
+        declare global {
+            interface Window {
+                editProject: (id: number) => Promise<void>;
+                deleteProject: (id: number) => Promise<void>;
+            }
+        }
+
+        // Elementos del DOM
+        const authSection = document.getElementById('auth-section');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Verificar autenticación al cargar
+        if (authToken) {
+            showAdminPanel();
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(elementId: string, message: string, isError = false) {
+            const element = document.getElementById(elementId);
+            const textElement = document.getElementById(`${elementId}-text`);
+            if (element && textElement) {
+                textElement.textContent = message;
+                element.classList.remove('hidden');
+                setTimeout(() => {
+                    element.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Login
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const emailElement = document.getElementById('email') as HTMLInputElement;
+                const passwordElement = document.getElementById('password') as HTMLInputElement;
+                const email = emailElement?.value || '';
+                const password = passwordElement?.value || '';
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/users/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        authToken = data.data.session.access_token;
+                        localStorage.setItem('authToken', authToken || '');
+                        showMessage('login-success', 'Inicio de sesión exitoso');
+                        setTimeout(() => {
+                            showAdminPanel();
+                        }, 1000);
+                    } else {
+                        showMessage('login-error', data.error || 'Error al iniciar sesión', true);
+                    }
+                } catch (error) {
+                    showMessage('login-error', 'Error de conexión', true);
+                }
+            });
+        }
+
+        // Logout
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch(`${API_BASE_URL}/users/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                        },
+                    });
+                } catch (error) {
+                    console.error('Error al cerrar sesión:', error);
+                }
+
+                localStorage.removeItem('authToken');
+                authToken = null;
+                showAuthSection();
+            });
+        }
+
+        // Navegación
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const htmlBtn = btn as HTMLElement;
+                const section = htmlBtn.dataset?.section;
+                if (section) {
+                    showSection(section);
+                }
+                
+                // Actualizar navegación activa
+                document.querySelectorAll('.nav-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-primary', 'text-primary-foreground');
+                    b.classList.add('text-muted-foreground', 'hover:bg-muted', 'hover:text-card-foreground');
+                });
+                btn.classList.add('active', 'bg-primary', 'text-primary-foreground');
+                btn.classList.remove('text-muted-foreground', 'hover:bg-muted', 'hover:text-card-foreground');
+            });
+        });
+
+        function showAuthSection() {
+            if (authSection) authSection.classList.remove('hidden');
+            if (adminPanel) adminPanel.classList.add('hidden');
+            if (logoutBtn) {
+                logoutBtn.classList.add('hidden');
+                logoutBtn.classList.remove('flex', 'items-center', 'space-x-2');
+            }
+        }
+
+        function showAdminPanel() {
+            if (authSection) authSection.classList.add('hidden');
+            if (adminPanel) adminPanel.classList.remove('hidden');
+            if (logoutBtn) {
+                logoutBtn.classList.remove('hidden');
+                logoutBtn.classList.add('flex', 'items-center', 'space-x-2');
+            }
+            loadDashboard();
+            loadProfile();
+            loadProjects();
+        }
+
+        function showSection(sectionName: string) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+        }
+
+        // Dashboard
+        async function loadDashboard() {
+            try {
+                const [projectsResponse, profileResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/projects/read`),
+                    fetch(`${API_BASE_URL}/profiles/read`)
+                ]);
+
+                const projectsData = await projectsResponse.json();
+                const profileData = await profileResponse.json();
+
+                const totalProjectsEl = document.getElementById('total-projects');
+                const profileStatusEl = document.getElementById('profile-status');
+                const dashboardLoadingEl = document.querySelector('#dashboard .loading') as HTMLElement;
+                const statsEl = document.getElementById('stats');
+
+                if (totalProjectsEl) totalProjectsEl.textContent = String(projectsData.data?.length || 0);
+                if (profileStatusEl) profileStatusEl.textContent = profileData.data ? 'Configurado' : 'No configurado';
+
+                if (dashboardLoadingEl) dashboardLoadingEl.classList.add('hidden');
+                if (statsEl) statsEl.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+            }
+        }
+
+        // Variables para almacenar datos originales
+        let originalProjectData: any = null;
+        let originalProfileData: any = null;
+
+        // Función helper para obtener solo los campos modificados
+        function getChangedFields(original: any, current: any): any {
+            const changed: any = {};
+            for (const key in current) {
+                if (current[key] !== original[key]) {
+                    changed[key] = current[key];
+                }
+            }
+            return Object.keys(changed).length > 0 ? changed : null;
+        }
+
+        // Gestión de Perfil
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/profiles/read`);
+                const data = await response.json();
+
+                if (data.data) {
+                    const currentProfileEl = document.getElementById('current-profile');
+                    const profileDisplayEl = document.getElementById('profile-display');
+                    
+                    if (currentProfileEl) currentProfileEl.classList.remove('hidden');
+                    if (profileDisplayEl) {
+                        profileDisplayEl.innerHTML = `
+                            <p><strong>Nombre:</strong> ${data.data.nombre}</p>
+                            <p><strong>Email:</strong> ${data.data.contactEmail}</p>
+                            <p><strong>Descripción:</strong> ${data.data.aboutMeDescription}</p>
+                        `;
+                    }
+
+                    const nombreEl = document.getElementById('nombre') as HTMLInputElement;
+                    const perfilUrlEl = document.getElementById('perfilUrl') as HTMLInputElement;
+                    const aboutMeEl = document.getElementById('aboutMeDescription') as HTMLTextAreaElement;
+                    const contactEmailEl = document.getElementById('contactEmail') as HTMLInputElement;
+                    
+                    if (nombreEl) nombreEl.value = data.data.nombre;
+                    if (perfilUrlEl) perfilUrlEl.value = data.data.perfil_url;
+                    if (aboutMeEl) aboutMeEl.value = data.data.about_me_description;
+                    if (contactEmailEl) contactEmailEl.value = data.data.contact_email;
+
+                    originalProfileData = {
+                        nombre: data.data.nombre,
+                        perfilUrl: data.data.perfil_url,
+                        aboutMeDescription: data.data.about_me_description,
+                        contactEmail: data.data.contact_email,
+                    };
+                }
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+            }
+        }
+
+        // Guardar perfil
+        const profileForm = document.getElementById('profile-form');
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const nombreEl = document.getElementById('nombre') as HTMLInputElement;
+                const perfilUrlEl = document.getElementById('perfilUrl') as HTMLInputElement;
+                const aboutMeEl = document.getElementById('aboutMeDescription') as HTMLTextAreaElement;
+                const contactEmailEl = document.getElementById('contactEmail') as HTMLInputElement;
+
+                const currentProfileData = {
+                    nombre: nombreEl?.value || '',
+                    perfilUrl: perfilUrlEl?.value || '',
+                    aboutMeDescription: aboutMeEl?.value || '',
+                    contactEmail: contactEmailEl?.value || '',
+                };
+
+                const changedData = originalProfileData ? getChangedFields(originalProfileData, currentProfileData) : currentProfileData;
+
+                if (!changedData) {
+                    showMessage('profile-success', 'No hay cambios para guardar');
+                    return;
+                }
+
+                try {
+                    console.log('Actualizando perfil:', changedData);
+
+                    const response = await fetch(`${API_BASE_URL}/profiles/update`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`,
+                        },
+                        body: JSON.stringify(changedData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage('profile-success', 'Perfil guardado exitosamente');
+                        originalProfileData = { ...currentProfileData };
+                        loadProfile();
+                        loadDashboard();
+                    } else {
+                        showMessage('profile-error', data.error || 'Error al guardar perfil', true);
+                    }
+                } catch (error) {
+                    showMessage('profile-error', 'Error de conexión', true);
+                }
+            });
+        }
+
+        // Gestión de Proyectos
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/read`);
+                const data = await response.json();
+
+                const projectsList = document.getElementById('projects-list');
+                
+                if (projectsList) {
+                    if (data.data && data.data.length > 0) {
+                        projectsList.innerHTML = '';
+                        
+                        const title = document.createElement('h3');
+                        title.className = 'text-xl font-semibold text-card-foreground mb-6';
+                        title.textContent = 'Proyectos Existentes';
+                        projectsList.appendChild(title);
+                        
+                        const grid = document.createElement('div');
+                        grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+                        
+                        data.data.forEach((project: any) => {
+                            const projectCard = document.createElement('div');
+                            projectCard.className = 'bg-card border border-border rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow';
+                            
+                            // Imagen
+                            const img = document.createElement('img');
+                            img.src = project.image_src;
+                            img.alt = project.title;
+                            img.className = 'w-full h-48 object-cover';
+                            img.onerror = function() {
+                                this.src = 'https://via.placeholder.com/400x200?text=Imagen+no+disponible';
+                            };
+                            
+                            // Contenido
+                            const content = document.createElement('div');
+                            content.className = 'p-6';
+                            
+                            // Título
+                            const titleEl = document.createElement('h4');
+                            titleEl.className = 'text-lg font-semibold text-card-foreground mb-2';
+                            titleEl.textContent = project.title;
+                            
+                            // Descripción
+                            const desc = document.createElement('p');
+                            desc.className = 'text-muted-foreground text-sm mb-4 line-clamp-3';
+                            desc.textContent = project.description;
+                            
+                            // Tecnologías
+                            const techContainer = document.createElement('div');
+                            if (project.tech_section) {
+                                techContainer.className = 'flex flex-wrap gap-2 mb-4';
+                                const techs = project.tech_section.split(',');
+                                techs.forEach((tech: string) => {
+                                    const techSpan = document.createElement('span');
+                                    techSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-medium';
+                                    techSpan.textContent = tech.trim();
+                                    techContainer.appendChild(techSpan);
+                                });
+                            }
+                            
+                            // Enlaces
+                            const linksContainer = document.createElement('div');
+                            linksContainer.className = 'flex gap-2 mb-4';
+                            
+                            if (project.github_link) {
+                                const githubLink = document.createElement('a');
+                                githubLink.href = project.github_link;
+                                githubLink.target = '_blank';
+                                githubLink.className = 'flex items-center space-x-1 bg-muted text-muted-foreground px-3 py-1 rounded-md text-xs hover:bg-muted/80 transition-colors';
+                                githubLink.innerHTML = '<i class="fab fa-github"></i><span>GitHub</span>';
+                                linksContainer.appendChild(githubLink);
+                            }
+                            
+                            if (project.live_demo_link) {
+                                const demoLink = document.createElement('a');
+                                demoLink.href = project.live_demo_link;
+                                demoLink.target = '_blank';
+                                demoLink.className = 'flex items-center space-x-1 bg-muted text-muted-foreground px-3 py-1 rounded-md text-xs hover:bg-muted/80 transition-colors';
+                                demoLink.innerHTML = '<i class="fas fa-external-link-alt"></i><span>Demo</span>';
+                                linksContainer.appendChild(demoLink);
+                            }
+                            
+                            // Botones
+                            const buttonsContainer = document.createElement('div');
+                            buttonsContainer.className = 'flex gap-2';
+                            
+                            const editBtn = document.createElement('button');
+                            editBtn.className = 'flex-1 bg-warning text-warning-foreground px-3 py-2 rounded-lg text-sm font-medium hover:bg-warning/90 transition-colors flex items-center justify-center space-x-1';
+                            editBtn.innerHTML = '<i class="fas fa-edit"></i><span>Editar</span>';
+                            editBtn.addEventListener('click', () => window.editProject(project.id));
+                            
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'flex-1 bg-error text-error-foreground px-3 py-2 rounded-lg text-sm font-medium hover:bg-error/90 transition-colors flex items-center justify-center space-x-1';
+                            deleteBtn.innerHTML = '<i class="fas fa-trash"></i><span>Eliminar</span>';
+                            deleteBtn.addEventListener('click', () => window.deleteProject(project.id));
+                            
+                            buttonsContainer.appendChild(editBtn);
+                            buttonsContainer.appendChild(deleteBtn);
+                            
+                            // Ensamblar todo
+                            content.appendChild(titleEl);
+                            content.appendChild(desc);
+                            content.appendChild(techContainer);
+                            content.appendChild(linksContainer);
+                            content.appendChild(buttonsContainer);
+                            
+                            projectCard.appendChild(img);
+                            projectCard.appendChild(content);
+                            grid.appendChild(projectCard);
+                        });
+                        
+                        projectsList.appendChild(grid);
+                    } else {
+                        projectsList.innerHTML = '<div class="text-center py-12"><p class="text-muted-foreground">No hay proyectos aún. ¡Crea tu primer proyecto!</p></div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando proyectos:', error);
+                const projectsListEl = document.getElementById('projects-list');
+                if (projectsListEl) {
+                    projectsListEl.innerHTML = '<div class="text-center py-12"><p class="text-error">Error al cargar proyectos</p></div>';
+                }
+            }
+        }
+
+        // Nuevo proyecto
+        const newProjectBtn = document.getElementById('new-project-btn');
+        if (newProjectBtn) {
+            newProjectBtn.addEventListener('click', () => {
+                const formTitleEl = document.getElementById('project-form-title');
+                const projectFormEl = document.getElementById('project-form') as HTMLFormElement;
+                const projectIdEl = document.getElementById('project-id') as HTMLInputElement;
+                const formContainerEl = document.getElementById('project-form-container');
+                const imageEl = document.getElementById('project-image') as HTMLInputElement;
+                
+                if (formTitleEl) formTitleEl.textContent = 'Nuevo Proyecto';
+                if (projectFormEl) projectFormEl.reset();
+                if (projectIdEl) projectIdEl.value = '';
+                if (formContainerEl) formContainerEl.classList.remove('hidden');
+                if (imageEl) imageEl.required = true; // Hacer imagen requerida para nuevos proyectos
+                
+                originalProjectData = null;
+            });
+        }
+
+        // Cancelar proyecto
+        const cancelProjectBtn = document.getElementById('cancel-project');
+        if (cancelProjectBtn) {
+            cancelProjectBtn.addEventListener('click', () => {
+                const formContainerEl = document.getElementById('project-form-container');
+                if (formContainerEl) formContainerEl.classList.add('hidden');
+            });
+        }
+
+        // Guardar proyecto
+        const projectForm = document.getElementById('project-form');
+        if (projectForm) {
+            projectForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const titleEl = document.getElementById('project-title') as HTMLInputElement;
+                const descriptionEl = document.getElementById('project-description') as HTMLTextAreaElement;
+                const imageEl = document.getElementById('project-image') as HTMLInputElement;
+                const githubEl = document.getElementById('project-github') as HTMLInputElement;
+                const demoEl = document.getElementById('project-demo') as HTMLInputElement;
+                const techEl = document.getElementById('project-tech') as HTMLInputElement;
+                const projectIdEl = document.getElementById('project-id') as HTMLInputElement;
+
+                const projectId = projectIdEl?.value || '';
+                const isEdit = projectId !== '';
+
+                // Validar campos obligatorios
+                const title = titleEl?.value?.trim() || '';
+                const description = descriptionEl?.value?.trim() || '';
+                const techSection = techEl?.value?.trim() || '';
+                
+                if (!title) {
+                    showMessage('projects-error', 'El título es obligatorio', true);
+                    return;
+                }
+                
+                if (!description) {
+                    showMessage('projects-error', 'La descripción es obligatoria', true);
+                    return;
+                }
+                
+                if (!techSection) {
+                    showMessage('projects-error', 'Las tecnologías son obligatorias', true);
+                    return;
+                }
+                
+                if (!isEdit && (!imageEl?.files || !imageEl.files[0])) {
+                    showMessage('projects-error', 'La imagen es obligatoria para proyectos nuevos', true);
+                    return;
+                }
+
+                // Crear FormData para manejar la subida de archivos
+                const formData = new FormData();
+                
+                // Si es edición, agregar el ID
+                if (isEdit) {
+                    formData.append('id', projectId);
+                }
+                
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('github_link', githubEl?.value?.trim() || '');
+                formData.append('live_demo_link', demoEl?.value?.trim() || '');
+                formData.append('techSection', techSection);
+
+                // Solo agregar imagen si se seleccionó una nueva
+                if (imageEl?.files && imageEl.files[0]) {
+                    formData.append('image', imageEl.files[0]);
+                }
+
+                try {
+                    const url = isEdit 
+                        ? `${API_BASE_URL}/projects/update/${projectId}`
+                        : `${API_BASE_URL}/projects/create`;
+                    
+                    const method = isEdit ? 'PATCH' : 'POST';
+
+                    // Debug: mostrar los datos que se van a enviar
+                    console.log(`${isEdit ? 'Actualizando' : 'Creando'} proyecto:`, {
+                        projectId: isEdit ? projectId : 'nuevo',
+                        title,
+                        description,
+                        techSection,
+                        githubLink: githubEl?.value?.trim() || '',
+                        liveDemoLink: demoEl?.value?.trim() || '',
+                        hasImage: !!(imageEl?.files && imageEl.files[0]),
+                        url: url,
+                        method: method
+                    });
+
+                    // Debug: mostrar contenido del FormData
+                    console.log('FormData contents:');
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+
+                    const response = await fetch(url, {
+                        method,
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                        },
+                        body: formData,
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    if (response.ok) {
+                        showMessage('projects-success', `Proyecto ${isEdit ? 'actualizado' : 'creado'} exitosamente`);
+                        
+                        const projectFormContainer = document.getElementById('project-form-container');
+                        if (projectFormContainer) {
+                            projectFormContainer.classList.add('hidden');
+                        }
+                        loadProjects();
+                        loadDashboard();
+                    } else {
+                        console.error('Error del servidor:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: data
+                        });
+                        
+                        let errorMessage = 'Error al guardar proyecto';
+                        if (data.error) {
+                            errorMessage = data.error;
+                        } else if (data.message) {
+                            errorMessage = data.message;
+                        } else if (data.details) {
+                            errorMessage = data.details;
+                        }
+                        
+                        showMessage('projects-error', `${errorMessage} (Status: ${response.status})`, true);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('projects-error', 'Error de conexión', true);
+                }
+            });
+        }
+
+        // Editar proyecto
+        window.editProject = async (id: number) => {
+            try {
+                console.log('Editando proyecto con ID:', id);
+                const response = await fetch(`${API_BASE_URL}/projects/read`);
+                const data = await response.json();
+                const project = data.data.find((p: any) => p.id === id);
+
+                if (project) {
+                    console.log('Proyecto encontrado:', project);
+                    const formTitleEl = document.getElementById('project-form-title');
+                    const projectIdEl = document.getElementById('project-id') as HTMLInputElement;
+                    const titleEl = document.getElementById('project-title') as HTMLInputElement;
+                    const descriptionEl = document.getElementById('project-description') as HTMLTextAreaElement;
+                    const githubEl = document.getElementById('project-github') as HTMLInputElement;
+                    const demoEl = document.getElementById('project-demo') as HTMLInputElement;
+                    const techEl = document.getElementById('project-tech') as HTMLInputElement;
+                    const formContainerEl = document.getElementById('project-form-container');
+
+                    if (formTitleEl) formTitleEl.textContent = 'Editar Proyecto';
+                    if (projectIdEl) {
+                        projectIdEl.value = String(project.id);
+                        console.log('ID establecido en el formulario:', projectIdEl.value);
+                    }
+                    if (titleEl) titleEl.value = project.title;
+                    if (descriptionEl) descriptionEl.value = project.description;
+                    if (githubEl) githubEl.value = project.github_link || '';
+                    if (demoEl) demoEl.value = project.live_demo_link || '';
+                    if (techEl) techEl.value = project.tech_section || '';
+                    if (formContainerEl) formContainerEl.classList.remove('hidden');
+
+                    // Cambiar el input de imagen para que no sea requerido en edición
+                    const imageEl = document.getElementById('project-image') as HTMLInputElement;
+                    if (imageEl) imageEl.required = false;
+
+                    originalProjectData = {
+                        title: project.title,
+                        description: project.description,
+                        githubLink: project.github_link || '',
+                        liveDemoLink: project.live_demo_link || '',
+                        techSection: project.tech_section || '',
+                    };
+                } else {
+                    console.error('Proyecto no encontrado con ID:', id);
+                    showMessage('projects-error', 'Proyecto no encontrado', true);
+                }
+            } catch (error) {
+                console.error('Error al cargar proyecto:', error);
+                showMessage('projects-error', 'Error al cargar proyecto', true);
+            }
+        };
+
+        // Eliminar proyecto
+        window.deleteProject = async (id: number) => {
+            console.log('Intentando eliminar proyecto con ID:', id);
+            if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+                try {
+                    console.log('Eliminando proyecto...');
+                    const response = await fetch(`${API_BASE_URL}/projects/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                        },
+                    });
+
+                    const data = await response.json();
+                    console.log('Respuesta del servidor:', data);
+
+                    if (response.ok) {
+                        showMessage('projects-success', 'Proyecto eliminado exitosamente');
+                        loadProjects();
+                        loadDashboard();
+                    } else {
+                        console.error('Error del servidor al eliminar:', data);
+                        showMessage('projects-error', data.error || data.message || 'Error al eliminar proyecto', true);
+                    }
+                } catch (error) {
+                    console.error('Error de conexión al eliminar:', error);
+                    showMessage('projects-error', 'Error de conexión', true);
+                }
+            }
+        };
+    </script>
+</Layout>

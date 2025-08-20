@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/hero.astro';
+import About from '../components/about.astro';
+import backgroundSvg from '../assets/background.svg';
+import Projects from '../components/projects.astro';
+import Contact from '../components/contact.astro';
+import Nav from '../layouts/nav.astro';
+import Footer from '../layouts/footer.astro';
+---
+
+<Layout>
+	<main class="relative min-h-screen">
+		<!-- Fondo SVG con overlay de colores de tu paleta -->
+		<div class="fixed inset-0 z-0">
+			<img 
+				src={backgroundSvg.src} 
+				alt="Background" 
+				class="w-full h-full object-cover opacity-20"
+			/>
+			<!-- Overlay con gradiente de tu paleta -->
+			<div class="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/60 to-primary/90"></div>
+		</div>
+		
+		<!-- Contenido principal -->
+		<div class="relative z-10">
+			<Nav />
+			<Hero />
+			<Projects />
+			<About />
+			<Contact />
+			<Footer />
+		</div>
+	</main>
+</Layout>

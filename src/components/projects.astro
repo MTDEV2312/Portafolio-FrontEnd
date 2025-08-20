@@ -1,0 +1,67 @@
+---
+import CardProjects from './cardProjects.astro';
+import { getProjects, fallbackProjects, formatTechnologies, type Project } from '../services/api.ts';
+
+// Obtener proyectos desde la API en tiempo de build (SSG)
+let projects: Project[] = [];
+
+try {
+  // Intentar obtener datos del backend
+  projects = await getProjects();
+  
+  // Si no hay proyectos desde la API, usar datos de fallback
+  if (!projects || projects.length === 0) {
+    console.log('⚠️ No se encontraron proyectos desde la API, usando datos de fallback');
+    projects = fallbackProjects;
+  } else {
+    console.log(`✅ ${projects.length} proyectos obtenidos desde la API`);
+  }
+} catch (error) {
+  console.error('❌ Error al obtener proyectos:', error);
+  projects = fallbackProjects;
+}
+
+// Mapear los datos de la API al formato esperado por el componente
+const mappedProjects = projects.map(project => ({
+  title: project.title,
+  description: project.description,
+  imageSrc: project.image_src,
+  githubLink: project.github_link || '',
+  liveDemoLink: project.live_demo_link || '',
+  technologies: formatTechnologies(project.techSection)
+}));
+---
+
+<section id="projects" class="py-16 px-6 relative">
+  <!-- Fondo para mejorar contraste -->
+  <div class="absolute inset-0 bg-muted/30 backdrop-blur-sm"></div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto">
+    <!-- Título de la sección -->
+    <div class="text-center mb-12">
+      <div class="bg-card/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-border inline-block">
+        <h2 class="text-4xl md:text-5xl font-bold text-primary mb-4">
+          Mis Proyectos
+        </h2>
+        <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Una selección de proyectos que demuestran mis habilidades en desarrollo web fullstack, 
+          desde aplicaciones complejas hasta sitios web optimizados.
+        </p>
+      </div>
+    </div>
+
+    <!-- Grid de proyectos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      {mappedProjects.map((project, index) => (
+        <CardProjects
+          title={project.title}
+          description={project.description}
+          imageSrc={project.imageSrc}
+          githubLink={project.githubLink}
+          liveDemoLink={project.liveDemoLink}
+          tech_section={project.technologies}
+        />
+      ))}
+    </div>
+  </div>
+</section>

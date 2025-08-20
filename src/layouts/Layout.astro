@@ -1,0 +1,31 @@
+---
+import '../styles/global.css'
+import ApiStatus from '../components/ApiStatus.astro';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Portafolio profesional de MT - Desarrollador web especializado en tecnologías modernas" />
+		<meta name="author" content="MT" />
+		<title>MT - Portafolio</title>
+	</head>
+	<body>
+		<slot />
+		<!-- Indicador de estado de API solo en desarrollo -->
+		<ApiStatus />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

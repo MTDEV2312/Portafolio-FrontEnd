@@ -1,0 +1,100 @@
+---
+import { getProfile, fallbackProfile, type Profile } from '../services/api.ts';
+
+// Obtener perfil desde la API en tiempo de build (SSG) para obtener el email de contacto
+let profile: Profile;
+
+try {
+  // Intentar obtener datos del backend
+  const apiProfile = await getProfile();
+  
+  if (!apiProfile) {
+    console.log('⚠️ No se encontró perfil desde la API para contacto, usando datos de fallback');
+    profile = fallbackProfile;
+  } else {
+    console.log('✅ Perfil obtenido desde la API para contacto');
+    profile = apiProfile;
+  }
+} catch (error) {
+  console.error('❌ Error al obtener perfil para contacto:', error);
+  profile = fallbackProfile;
+}
+---
+
+<section id="contact" class="py-20 px-6 bg-transparent min-h-screen flex items-center justify-center">
+  <div class="max-w-6xl w-full mx-auto">
+    <!-- Título de la sección -->
+    <div class="text-center mb-16">
+      <h2 class="text-5xl md:text-6xl font-bold text-secondary mb-6">
+        Contáctame
+      </h2>
+      <p class="text-xl text-accent max-w-3xl mx-auto leading-relaxed">
+        ¿Tienes un proyecto en mente o quieres colaborar? Me encantaría escuchar de ti.
+      </p>
+    </div>
+
+    <!-- Contenido principal centrado -->
+    <div class="flex justify-center">
+      <div class="w-full max-w-2xl">
+        <!-- Información de contacto -->
+        <div class="bg-primary/20 rounded-3xl p-12 border-2 border-accent/30 text-center">
+          <h3 class="text-3xl font-bold text-primary-foreground mb-8">Información de Contacto</h3>
+          
+          <!-- Email -->
+          <div class="mb-8">
+            <h4 class="text-base font-semibold text-tertiary mb-4 uppercase tracking-wide">Email</h4>
+            <div class="flex items-center justify-center gap-4 group">
+              <span id="contact-email" class="text-accent font-semibold text-xl md:text-2xl select-all">
+                {profile.contactEmail}
+              </span>
+              <button 
+                id="copy-email"
+                class="bg-accent text-accent-foreground hover:bg-accent/80 hover:scale-110 p-3 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary"
+                title="Copiar dirección de correo"
+                aria-label="Copiar dirección de correo al portapapeles"
+              >
+                <!-- Icono Copy SVG -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+            <!-- Mensaje de confirmación -->
+            <div id="copy-feedback" class="text-base text-tertiary mt-3 opacity-0 transition-opacity duration-300">
+              ✓ ¡Email copiado al portapapeles!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Texto de pie -->
+    <div class="text-center mt-12">
+      <p class="text-xl text-accent">
+        Respondo todos los mensajes dentro de 24 horas. ¡Espero saber de ti pronto!
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Funcionalidad para copiar email
+  document.getElementById('copy-email')?.addEventListener('click', async () => {
+    const email = document.getElementById('contact-email')?.textContent?.trim();
+    const feedback = document.getElementById('copy-feedback');
+    
+    if (email) {
+      try {
+        await navigator.clipboard.writeText(email);
+        if (feedback) {
+          feedback.style.opacity = '1';
+          setTimeout(() => {
+            feedback.style.opacity = '0';
+          }, 3000);
+        }
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    }
+  });
+</script>
