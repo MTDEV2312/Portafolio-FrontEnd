@@ -307,7 +307,7 @@ import Layout from '../layouts/Layout.astro';
 
     <script>
         // Configuración de la API
-        const API_BASE_URL = '/api';
+        const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://backend-portafolio-q0ig.onrender.com/api';
         let authToken = localStorage.getItem('authToken');
 
         // Declarar funciones globales primero

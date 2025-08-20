@@ -25,10 +25,10 @@ export default defineConfig({
         }
       }
     },
-    // Configuración del servidor de desarrollo
+    // Configuración del servidor de desarrollo  
     server: {
       proxy: {
-        '/api': 'http://localhost:3000'
+        '/api': 'https://backend-portafolio-q0ig.onrender.com'
       }
     }
   },
