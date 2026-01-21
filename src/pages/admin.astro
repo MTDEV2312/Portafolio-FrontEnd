@@ -745,8 +745,8 @@ import Icons from '../components/admin/Icons.astro';
                 formData.append('title', (document.getElementById('project-title') as HTMLInputElement).value);
                 formData.append('description', (document.getElementById('project-description') as HTMLTextAreaElement).value);
                 formData.append('techSection', (document.getElementById('project-tech') as HTMLInputElement).value);
-                formData.append('github_link', (document.getElementById('project-github') as HTMLInputElement).value || '');
-                formData.append('live_demo_link', (document.getElementById('project-demo') as HTMLInputElement).value || '');
+                formData.append('githubLink', (document.getElementById('project-github') as HTMLInputElement).value || '');
+                formData.append('liveDemoLink', (document.getElementById('project-demo') as HTMLInputElement).value || '');
                 if (imageFile) formData.append('image', imageFile);
 
                 try {
