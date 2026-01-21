@@ -9,7 +9,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://backend-portafolio-q0ig.onrender.com/api/$1"
+      "destination": "https://mathiast.me/api/$1"
     }
   ],
   "headers": [
