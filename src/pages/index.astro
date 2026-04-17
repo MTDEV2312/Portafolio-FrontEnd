@@ -11,7 +11,7 @@ import Footer from '../layouts/footer.astro';
 <Layout>
 	<main class="relative min-h-screen">
 		<!-- Fondo SVG con overlay de colores de tu paleta -->
-		<div class="fixed inset-0 z-0">
+		<div class="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
 			<!-- Overlay con gradiente de tu paleta -->
 			<div class="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/60 to-primary/90"></div>
 		</div>
