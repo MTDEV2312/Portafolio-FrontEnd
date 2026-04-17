@@ -42,6 +42,70 @@ html, body {
   padding: 0;
 }
 
+html {
+  scroll-behavior: auto;
+  scroll-padding-top: 6.5rem;
+}
+
+body {
+  background: var(--color-muted);
+  color: var(--color-card-foreground);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+section[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  z-index: 100;
+  transform: translateY(-140%);
+  padding: 0.85rem 1.1rem;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.18);
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Sistema de espaciado consistente */
 :root {
   --spacing-xs: 0.25rem;
