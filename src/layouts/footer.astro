@@ -25,16 +25,16 @@ const currentYear = new Date().getFullYear();
       <div class="text-center">
         <h3 class="text-primary-foreground font-semibold text-lg mb-4">Quick Links</h3>
         <nav class="flex flex-col space-y-2">
-          <a href="#home" class="text-accent hover:text-primary-foreground transition-colors duration-300 text-sm">
+          <a href="#home" class="text-accent hover:text-primary-foreground transition-colors duration-200 text-sm">
             Home
           </a>
-          <a href="#about" class="text-accent hover:text-primary-foreground transition-colors duration-300 text-sm">
+          <a href="#about" class="text-accent hover:text-primary-foreground transition-colors duration-200 text-sm">
             About Me
           </a>
-          <a href="#projects" class="text-accent hover:text-primary-foreground transition-colors duration-300 text-sm">
+          <a href="#projects" class="text-accent hover:text-primary-foreground transition-colors duration-200 text-sm">
             Projects
           </a>
-          <a href="#contact" class="text-accent hover:text-primary-foreground transition-colors duration-300 text-sm">
+          <a href="#contact" class="text-accent hover:text-primary-foreground transition-colors duration-200 text-sm">
             Contact
           </a>
         </nav>
@@ -48,7 +48,7 @@ const currentYear = new Date().getFullYear();
             href="https://github.com/MTDEV2312"
             target="_blank"
             rel="noopener noreferrer"
-            class="bg-quaternary text-quaternary-foreground hover:bg-quaternary/80 hover:scale-110 p-3 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-quaternary focus:ring-offset-2 focus:ring-offset-primary"
+            class="bg-quaternary text-quaternary-foreground hover:bg-quaternary/80 p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-quaternary focus:ring-offset-2 focus:ring-offset-primary"
             aria-label="Ver perfil de GitHub (se abre en nueva pestaña)"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +59,7 @@ const currentYear = new Date().getFullYear();
             href="https://ec.linkedin.com/in/mathias-teran-236727290"
             target="_blank"
             rel="noopener noreferrer"
-            class="bg-tertiary text-tertiary-foreground hover:bg-tertiary/80 hover:scale-110 p-3 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-tertiary focus:ring-offset-2 focus:ring-offset-primary"
+            class="bg-tertiary text-tertiary-foreground hover:bg-tertiary/80 p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-tertiary focus:ring-offset-2 focus:ring-offset-primary"
             aria-label="Ver perfil de LinkedIn (se abre en nueva pestaña)"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -92,22 +92,3 @@ const currentYear = new Date().getFullYear();
     </div>
   </div>
 </footer>
-
-<script>
-  // Smooth scroll para los enlaces del footer
-  document.querySelectorAll('footer a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', (e) => {
-      e.preventDefault();
-      const href = anchor.getAttribute('href');
-      if (href) {
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      }
-    });
-  });
-</script>

@@ -1,6 +1,17 @@
 ---
 import '../styles/global.css'
 import ApiStatus from '../components/ApiStatus.astro';
+
+let supabaseOrigin = '';
+
+try {
+	const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+	if (supabaseUrl) {
+		supabaseOrigin = new URL(supabaseUrl).origin;
+	}
+} catch {
+	supabaseOrigin = '';
+}
 ---
 
 <!doctype html>
@@ -8,6 +19,9 @@ import ApiStatus from '../components/ApiStatus.astro';
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="theme-color" content="#0c2443" />
+		{supabaseOrigin && <link rel="dns-prefetch" href={supabaseOrigin} />}
+		{supabaseOrigin && <link rel="preconnect" href={supabaseOrigin} crossorigin />}
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Portafolio profesional de MT - Desarrollador web especializado en tecnologías modernas" />
@@ -15,6 +29,7 @@ import ApiStatus from '../components/ApiStatus.astro';
 		<title>MT - Portafolio</title>
 	</head>
 	<body>
+		<a class="skip-link" href="#home">Saltar al contenido principal</a>
 		<slot />
 		<!-- Indicador de estado de API solo en desarrollo -->
 		<ApiStatus />
