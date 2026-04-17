@@ -3,6 +3,8 @@ const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
 
 // Variable global para rastrear el estado de la API
 let apiStatus: 'unknown' | 'available' | 'unavailable' = 'unknown';
+let profilePromise: Promise<Profile | null> | null = null;
+let projectsPromise: Promise<Project[]> | null = null;
 
 // Función para obtener el estado de la API
 export function getApiStatus() {
@@ -12,12 +14,15 @@ export function getApiStatus() {
 // Tipos TypeScript para los datos
 export interface Project {
   id: number;
-  image_src: string;
+  image_src?: string;
+  imageSrc?: string;
   title: string;
   description: string;
   github_link?: string;
+  githubLink?: string;
   live_demo_link?: string;
-  techSection?: string; // Cambiado de tech_section a techSection
+  liveDemoLink?: string;
+  techSection?: string | string[]; // Cambiado de tech_section a techSection
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +44,11 @@ export interface ApiResponse<T> {
 
 // Función para obtener proyectos
 export async function getProjects(): Promise<Project[]> {
+  if (projectsPromise) {
+    return projectsPromise;
+  }
+
+  projectsPromise = (async () => {
   try {
     console.log(`🔄 Intentando obtener proyectos desde: ${API_BASE_URL}/projects/read`);
     
@@ -69,10 +79,18 @@ export async function getProjects(): Promise<Project[]> {
     apiStatus = 'unavailable';
     return fallbackProjects;
   }
+  })();
+
+  return projectsPromise;
 }
 
 // Función para obtener perfil
 export async function getProfile(): Promise<Profile | null> {
+  if (profilePromise) {
+    return profilePromise;
+  }
+
+  profilePromise = (async () => {
   try {
     console.log(`🔄 Intentando obtener perfil desde: ${API_BASE_URL}/profiles/read`);
     
@@ -107,23 +125,33 @@ export async function getProfile(): Promise<Profile | null> {
     apiStatus = 'unavailable';
     return fallbackProfile;
   }
+  })();
+
+  return profilePromise;
 }
 
 // Función para formatear tecnologías desde tech_section
-export function formatTechnologies(techSection?: string): string[] {
+export function formatTechnologies(techSection?: string | string[]): string[] {
   if (!techSection) return [];
-  
-  // Intenta parsear como JSON primero
-  try {
-    const parsed = JSON.parse(techSection);
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-  } catch {
-    // Si no es JSON válido, divide por comas
-    return techSection.split(',').map(tech => tech.trim()).filter(Boolean);
+
+  // La API puede devolver un array directo
+  if (Array.isArray(techSection)) {
+    return techSection.map((tech) => String(tech).trim()).filter(Boolean);
   }
-  
+
+  // Si es string JSON o CSV
+  if (typeof techSection === 'string') {
+    try {
+      const parsed = JSON.parse(techSection);
+      if (Array.isArray(parsed)) {
+        return parsed.map((tech) => String(tech).trim()).filter(Boolean);
+      }
+    } catch {
+      // Si no es JSON válido, divide por comas
+      return techSection.split(',').map((tech) => tech.trim()).filter(Boolean);
+    }
+  }
+
   return [];
 }
 
@@ -133,7 +161,7 @@ export const fallbackProjects: Project[] = [
     id: 1,
     title: "E-commerce Platform",
     description: "Una plataforma de comercio electrónico completa desarrollada con React y Node.js, que incluye gestión de productos, carrito de compras y sistema de pagos.",
-    image_src: "/placeholder-project.jpg",
+    image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/ecommerce-platform",
     live_demo_link: "https://ecommerce-demo.example.com",
     techSection: '["React", "Node.js", "MongoDB", "Stripe"]',
@@ -144,7 +172,7 @@ export const fallbackProjects: Project[] = [
     id: 2,
     title: "Task Management App",
     description: "Aplicación de gestión de tareas con funcionalidades de colaboración en tiempo real, notificaciones y seguimiento de progreso.",
-    image_src: "/placeholder-project.jpg",
+    image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/task-manager",
     live_demo_link: "https://taskmanager-demo.example.com",
     techSection: '["Vue.js", "Express", "Socket.io", "PostgreSQL"]',
@@ -155,7 +183,7 @@ export const fallbackProjects: Project[] = [
     id: 3,
     title: "Weather Dashboard",
     description: "Dashboard meteorológico interactivo que muestra pronósticos en tiempo real con gráficos dinámicos y alertas personalizadas.",
-    image_src: "/placeholder-project.jpg",
+    image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/weather-dashboard",
     techSection: '["JavaScript", "Chart.js", "OpenWeather API"]',
     created_at: new Date().toISOString(),
@@ -165,7 +193,7 @@ export const fallbackProjects: Project[] = [
     id: 4,
     title: "Portfolio Website",
     description: "Sitio web de portafolio personal desarrollado con Astro y Tailwind CSS, optimizado para rendimiento y accesibilidad.",
-    image_src: "/placeholder-project.jpg",
+    image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/portfolio",
     live_demo_link: "https://mathiasteran.dev",
     techSection: '["Astro", "Tailwind CSS", "TypeScript"]',
@@ -177,7 +205,7 @@ export const fallbackProjects: Project[] = [
 export const fallbackProfile: Profile = {
   id: 1,
   nombre: "Mathias Teran",
-  perfilUrl: "/placeholder-profile.jpg",
+  perfilUrl: "/logo_myt.svg",
   aboutMeDescription: "Soy un desarrollador FullStack apasionado por crear soluciones web innovadoras y eficientes. Me especializo en el desarrollo tanto del frontend como del backend, utilizando las tecnologías más actuales del mercado.",
   contactEmail: "contacto@mathiasteran.dev",
   created_at: new Date().toISOString(),
