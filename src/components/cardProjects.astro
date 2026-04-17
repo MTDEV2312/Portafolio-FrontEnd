@@ -6,19 +6,52 @@ export interface Props {
   githubLink?: string;
   liveDemoLink?: string;
   tech_section?: string[];
+  imageLoading?: 'lazy' | 'eager';
+  imageFetchPriority?: 'high' | 'low' | 'auto';
 }
 
-const { title, description, imageSrc, githubLink, liveDemoLink, tech_section } = Astro.props;
+import { buildImageUrl, buildImageSrcSet } from '../services/imageUrls.ts';
+
+const {
+  title,
+  description,
+  imageSrc,
+  githubLink,
+  liveDemoLink,
+  tech_section,
+  imageLoading = 'lazy',
+  imageFetchPriority = 'auto',
+} = Astro.props;
+
+const safeImageSrc = typeof imageSrc === 'string' && imageSrc.trim().length > 0
+  ? imageSrc
+  : '/logo_myt.svg';
+
+const projectImageUrl = buildImageUrl(safeImageSrc, {
+  width: 960,
+  height: 540,
+  quality: 78,
+});
+const projectImageSrcSet = buildImageSrcSet(safeImageSrc, [320, 480, 640, 960], {
+  height: 540,
+  quality: 78,
+});
 ---
 
-<article class="w-full flex flex-col md:flex-row bg-card/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-primary/20 overflow-hidden hover:scale-[1.02] hover:border-primary/40 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-card">
+<article class="w-full flex flex-col md:flex-row bg-card rounded-2xl shadow-xl border-2 border-primary/20 overflow-hidden hover:border-primary/40 transition-colors duration-200 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-card">
   <!-- Imagen del proyecto -->
   <div class="md:w-2/5 w-full flex items-center justify-center bg-muted/50 p-4">
     <img 
-      class="w-full h-48 md:h-56 object-cover rounded-xl border-2 border-border shadow-lg hover:border-primary transition-colors duration-300" 
-      src={imageSrc} 
+      class="w-full h-48 md:h-56 object-cover rounded-xl border-2 border-border shadow-lg hover:border-primary transition-colors duration-200" 
+      src={projectImageUrl} 
+      srcset={projectImageSrcSet}
       alt={`Captura de pantalla del proyecto ${title}`}
-      loading="lazy"
+      loading={imageLoading}
+      fetchpriority={imageFetchPriority}
+      decoding="async"
+      width="640"
+      height="360"
+      sizes="(min-width: 768px) 40vw, 100vw"
     />
   </div>
   
@@ -39,7 +72,7 @@ const { title, description, imageSrc, githubLink, liveDemoLink, tech_section } =
           <h4 class="text-sm font-semibold text-card-foreground mb-3">Technologies used:</h4>
           <div class="flex flex-wrap gap-2">
             {tech_section.map((tech) => (
-              <span class="bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-sm font-medium border border-primary/20 shadow-sm hover:bg-primary/90 transition-colors duration-200">
+              <span class="bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-sm font-medium border border-primary/20 shadow-sm hover:bg-primary/90 transition-colors duration-150">
                 {tech}
               </span>
             ))}
@@ -53,7 +86,7 @@ const { title, description, imageSrc, githubLink, liveDemoLink, tech_section } =
       {githubLink && (
         <a
           href={githubLink}
-          class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg hover:bg-primary/90 hover:scale-105 transition-all duration-300 font-semibold shadow-md border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card"
+          class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-semibold shadow-md border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Ver código fuente de ${title} en GitHub (se abre en nueva pestaña)`}
@@ -69,7 +102,7 @@ const { title, description, imageSrc, githubLink, liveDemoLink, tech_section } =
       {liveDemoLink && (
         <a
           href={liveDemoLink}
-          class="inline-flex items-center gap-2 bg-tertiary text-tertiary-foreground px-5 py-2.5 rounded-lg hover:bg-tertiary/90 hover:scale-105 transition-all duration-300 font-semibold shadow-md border border-tertiary/20 focus:outline-none focus:ring-2 focus:ring-tertiary focus:ring-offset-2 focus:ring-offset-card"
+          class="inline-flex items-center gap-2 bg-tertiary text-tertiary-foreground px-5 py-2.5 rounded-lg hover:bg-tertiary/90 transition-colors duration-200 font-semibold shadow-md border border-tertiary/20 focus:outline-none focus:ring-2 focus:ring-tertiary focus:ring-offset-2 focus:ring-offset-card"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Ver demo en vivo de ${title} (se abre en nueva pestaña)`}

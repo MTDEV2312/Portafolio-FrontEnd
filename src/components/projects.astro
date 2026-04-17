@@ -25,21 +25,21 @@ try {
 const mappedProjects = projects.map(project => ({
   title: project.title,
   description: project.description,
-  imageSrc: project.image_src,
-  githubLink: project.github_link || '',
-  liveDemoLink: project.live_demo_link || '',
+  imageSrc: project.imageSrc || project.image_src || '/logo_myt.svg',
+  githubLink: project.githubLink || project.github_link || '',
+  liveDemoLink: project.liveDemoLink || project.live_demo_link || '',
   technologies: formatTechnologies(project.techSection)
 }));
 ---
 
 <section id="projects" class="py-16 px-6 relative">
   <!-- Fondo para mejorar contraste -->
-  <div class="absolute inset-0 bg-muted/30 backdrop-blur-sm"></div>
+  <div class="absolute inset-0 bg-muted/55"></div>
   
   <div class="relative z-10 max-w-7xl mx-auto">
     <!-- Título de la sección -->
     <div class="text-center mb-12">
-      <div class="bg-card/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-border inline-block">
+      <div class="bg-card/95 p-8 rounded-2xl shadow-lg border border-border inline-block">
         <h2 class="text-4xl md:text-5xl font-bold text-primary mb-4">
           My Projects
         </h2>
@@ -59,6 +59,8 @@ const mappedProjects = projects.map(project => ({
           githubLink={project.githubLink}
           liveDemoLink={project.liveDemoLink}
           tech_section={project.technologies}
+          imageLoading={index < 2 ? 'eager' : 'lazy'}
+          imageFetchPriority={index < 2 ? 'high' : 'low'}
         />
       ))}
     </div>
