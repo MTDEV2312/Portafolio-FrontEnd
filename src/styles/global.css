@@ -91,6 +91,11 @@ section[id] {
   transform: translateY(0.75rem);
 }
 
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px 1200px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
