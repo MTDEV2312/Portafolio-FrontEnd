@@ -32,7 +32,7 @@ const mappedProjects = projects.map(project => ({
 }));
 ---
 
-<section id="projects" class="py-16 px-6 relative">
+<section id="projects" class="py-16 px-6 relative cv-auto">
   <!-- Fondo para mejorar contraste -->
   <div class="absolute inset-0 bg-muted/55"></div>
   
@@ -51,7 +51,7 @@ const mappedProjects = projects.map(project => ({
 
     <!-- Grid de proyectos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-      {mappedProjects.map((project, index) => (
+      {mappedProjects.map((project) => (
         <CardProjects
           title={project.title}
           description={project.description}
@@ -59,8 +59,8 @@ const mappedProjects = projects.map(project => ({
           githubLink={project.githubLink}
           liveDemoLink={project.liveDemoLink}
           tech_section={project.technologies}
-          imageLoading={index < 2 ? 'eager' : 'lazy'}
-          imageFetchPriority={index < 2 ? 'high' : 'low'}
+          imageLoading="lazy"
+          imageFetchPriority="low"
         />
       ))}
     </div>
