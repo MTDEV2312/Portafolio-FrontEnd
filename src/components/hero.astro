@@ -22,16 +22,19 @@ try {
 }
 
 const heroImageSource = profile.perfilUrl || '/logo_myt.svg';
-const heroImageUrl = buildImageUrl(heroImageSource, {
-	width: 640,
-	height: 640,
-	quality: 82,
-});
-const heroImageSrcSet = buildImageSrcSet(heroImageSource, [240, 320, 480, 640], {
-	height: 640,
-	quality: 82,
-});
+const heroImageUrl = buildImageUrl(heroImageSource);
+const heroImageSrcSet = buildImageSrcSet(heroImageSource, [240, 320, 480, 640], { quality: 70 });
+const heroImageSizes = '(min-width: 768px) 320px, 240px';
 ---
+
+<head>
+	<link
+		rel="preload"
+		as="image"
+		href={heroImageUrl}
+		{...(heroImageSrcSet ? { imagesrcset: heroImageSrcSet, imagesizes: heroImageSizes } : {})}
+	/>
+</head>
 
 <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
 	<!-- Fondo adicional para mejor contraste -->
@@ -43,11 +46,11 @@ const heroImageSrcSet = buildImageSrcSet(heroImageSource, [240, 320, 480, 640], 
 				<img 
 					src={heroImageUrl} 
 					srcset={heroImageSrcSet}
+					sizes={heroImageSizes}
 					alt={profile.nombre}
 					class="w-full h-full object-cover"
 					width="320"
 					height="320"
-					sizes="(min-width: 768px) 320px, 240px"
 					fetchpriority="high"
 					loading="eager"
 					decoding="async"
