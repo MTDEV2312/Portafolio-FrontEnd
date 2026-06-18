@@ -753,13 +753,10 @@ import Icons from '../components/admin/Icons.astro';
                     const url = isEdit ? `/projects/update/${projectId}` : `/projects/create`;
                     const method = isEdit ? 'PATCH' : 'POST';
 
-                    const response = await fetch(`${ApiClient.getBaseUrl()}${url}`, {
+                    await ApiClient.request(url, {
                         method,
-                        headers: { 'Authorization': `Bearer ${adminState.getToken()}` },
                         body: formData,
                     });
-
-                    if (!response.ok) throw new Error('Error al guardar proyecto');
 
                     showMessage('projects-messages', `Proyecto ${isEdit ? 'actualizado' : 'creado'} exitosamente`);
                     document.getElementById('project-form-container')?.classList.add('hidden');

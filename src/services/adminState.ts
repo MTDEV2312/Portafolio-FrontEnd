@@ -9,6 +9,7 @@ export interface AdminUser {
 export interface AdminSession {
   user: AdminUser | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
 }
 
@@ -37,10 +38,14 @@ export class AdminStateManager {
     const token = typeof localStorage !== 'undefined' 
       ? localStorage.getItem('authToken') 
       : null;
+    const refreshToken = typeof localStorage !== 'undefined' 
+      ? localStorage.getItem('authRefreshToken') 
+      : null;
     
     this.cache.set('session', {
       user: null,
       token: token || null,
+      refreshToken: refreshToken || null,
       isAuthenticated: !!token,
     } as AdminSession);
   }
@@ -49,6 +54,11 @@ export class AdminStateManager {
    * Obtiene dato del cache o lo invalida si expiró
    */
   get<T>(key: StateKey): T | null {
+    // La sesión, el estado de carga y los errores globales no expiran por el TTL de caché
+    if (key === 'session' || key === 'loading' || key === 'error') {
+      return this.cache.get(key) ?? null;
+    }
+
     const timestamp = this.timestamps.get(key) || 0;
     const isExpired = Date.now() - timestamp > this.TTL;
 
@@ -118,13 +128,18 @@ export class AdminStateManager {
   /**
    * Establece token de sesión y actualiza estado
    */
-  setToken(token: string, user?: AdminUser): void {
+  setToken(token: string, refreshToken?: string, user?: AdminUser): void {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('authToken', token);
+      if (refreshToken) {
+        localStorage.setItem('authRefreshToken', refreshToken);
+      }
     }
+    const currentSession = this.getSession();
     this.set('session', {
-      user: user || null,
+      user: user || currentSession.user || null,
       token,
+      refreshToken: refreshToken || currentSession.refreshToken || null,
       isAuthenticated: true,
     });
   }
@@ -135,10 +150,12 @@ export class AdminStateManager {
   clearSession(): void {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('authToken');
+      localStorage.removeItem('authRefreshToken');
     }
     this.set('session', {
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
     });
     this.invalidateAll();
@@ -151,6 +168,7 @@ export class AdminStateManager {
     return this.get<AdminSession>('session') || {
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
     };
   }
@@ -160,6 +178,13 @@ export class AdminStateManager {
    */
   getToken(): string | null {
     return this.getSession().token;
+  }
+
+  /**
+   * Obtiene refresh token actual
+   */
+  getRefreshToken(): string | null {
+    return this.getSession().refreshToken;
   }
 
   /**

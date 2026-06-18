@@ -1,6 +1,5 @@
 // API Client: Gestiona todas las peticiones con token automático
 import { adminState } from './adminState';
-import { DataManager } from './dataManager';
 
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -29,8 +28,7 @@ export class ApiClient {
     const { 
       method = 'GET', 
       headers = {}, 
-      body,
-      bypassCache = method !== 'GET'
+      body
     } = options;
 
     const url = `${this.API_BASE_URL}${endpoint}`;
@@ -51,20 +49,6 @@ export class ApiClient {
       finalHeaders['Content-Type'] = finalHeaders['Content-Type'] || 'application/json';
     }
 
-    // Usar DataManager para cache
-    if (method === 'GET' && !bypassCache) {
-      try {
-        const cached = await DataManager.fetch<T>(url, {
-          headers: finalHeaders,
-          ttl: 30000,
-          bypassCache: false,
-        });
-        return cached;
-      } catch (error) {
-        // Cache miss, fetching fresh
-      }
-    }
-
     // Realizar petición
     const response = await fetch(url, {
       method,
@@ -74,6 +58,44 @@ export class ApiClient {
 
     // Manejo de errores de autenticación
     if (response.status === 401 || response.status === 403) {
+      const refreshToken = adminState.getRefreshToken();
+      // Si tenemos refresh token y este request no es ya una llamada a refresh-token
+      if (refreshToken && !endpoint.includes('/users/refresh-token')) {
+        try {
+          console.log('🔄 Token expirado detectado. Intentando renovación automática...');
+          const refreshUrl = `${this.API_BASE_URL}/users/refresh-token`;
+          const refreshRes = await fetch(refreshUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+          });
+
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            const newSession = refreshData.data;
+            if (newSession && newSession.session) {
+              const newToken = newSession.session.access_token;
+              const newRefreshToken = newSession.session.refresh_token;
+              const user = newSession.user;
+              adminState.setToken(newToken, newRefreshToken, user);
+              console.log('✅ Token renovado exitosamente. Re-intentando petición original...');
+
+              // Volver a intentar la petición original con el nuevo token
+              const retryHeaders = {
+                ...options.headers,
+                'Authorization': `Bearer ${newToken}`
+              };
+              return await this.request<T>(endpoint, {
+                ...options,
+                headers: retryHeaders
+              });
+            }
+          }
+        } catch (refreshError) {
+          console.error('❌ Error al intentar renovar el token:', refreshError);
+        }
+      }
+
       adminState.clearSession();
       if (typeof window !== 'undefined') {
         window.location.href = '/admin?auth=required';
@@ -126,11 +148,10 @@ export class ApiClient {
   }
 
   /**
-   * Invalida cache para un endpoint
+   * Invalida cache para un endpoint (No-op tras remover DataManager)
    */
   static invalidateCache(endpoint: string) {
-    const url = `${this.API_BASE_URL}${endpoint}`;
-    DataManager.invalidate(url, 'GET');
+    // No-op: cache desactivado
   }
 
   /**

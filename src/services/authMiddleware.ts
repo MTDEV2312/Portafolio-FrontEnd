@@ -1,7 +1,6 @@
 // AuthMiddleware: Maneja autenticación y logout
 
 import { adminState } from './adminState';
-import { DataManager } from './dataManager';
 
 export class AuthMiddleware {
   /**
@@ -22,10 +21,10 @@ export class AuthMiddleware {
     }
 
     const token = data.data.session.access_token;
+    const refreshToken = data.data.session.refresh_token;
     const user = data.data.user;
 
-    adminState.setToken(token, user);
-    DataManager.invalidateAll(); // Limpiar cache al login
+    adminState.setToken(token, refreshToken, user);
 
     return { token, user };
   }
@@ -50,7 +49,6 @@ export class AuthMiddleware {
     } finally {
       // Limpiar sesión local después de intentar el logout
       adminState.clearSession();
-      DataManager.invalidateAll();
     }
   }
 
