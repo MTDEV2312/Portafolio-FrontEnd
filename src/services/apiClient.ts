@@ -1,163 +1,228 @@
-// API Client: Gestiona todas las peticiones con token automático
-import { adminState } from './adminState';
+// ApiClient: Consultas directas a Supabase + disparador de Vercel Deploy Hook
+// ponytail: orden por created_at desc e integracion con webhook de Vercel para rebuilds
+import { supabase } from './supabase';
 
-export interface ApiRequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
-  headers?: Record<string, string>;
-  body?: any;
-  bypassCache?: boolean;
-}
+async function triggerVercelDeployHook() {
+  const hookUrl = import.meta.env.PUBLIC_VERCEL_DEPLOY_HOOK;
+  if (!hookUrl) {
+    return;
+  }
 
-export interface ApiResponse<T> {
-  success?: boolean;
-  message?: string;
-  data?: T;
-  error?: string;
+  try {
+    console.log('🚀 Disparando Vercel Deploy Hook para reconstruir el sitio...');
+    await fetch(hookUrl, { method: 'POST' });
+  } catch (err) {
+    console.error('❌ Error al invocar Vercel Deploy Hook:', err);
+  }
 }
 
 export class ApiClient {
-  private static readonly API_BASE_URL = import.meta.env?.PUBLIC_API_URL || '';
+  /**
+   * GET genérico de recursos de administración
+   */
+  static async get<T>(endpoint: string): Promise<T> {
+    if (endpoint.includes('/projects/read')) {
+      const { data, error } = await supabase
+        .from('proyectos')
+        .select('*')
+        .order('created_at', { ascending: false, nullsFirst: false });
+      if (error) throw new Error(error.message);
+      
+      const mapped = (data || []).map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        imageSrc: p.image_src,
+        image_src: p.image_src,
+        githubLink: p.github_link,
+        github_link: p.github_link,
+        liveDemoLink: p.live_demo_link,
+        live_demo_link: p.live_demo_link,
+        techSection: p.techSection || p.tech_section,
+        tech_section: p.tech_section || p.techSection,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+      }));
+      return mapped as unknown as T;
+    }
+
+    if (endpoint.includes('/profiles/read')) {
+      const { data, error } = await supabase
+        .from('presentador')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) return null as unknown as T;
+
+      return {
+        id: data.id,
+        nombre: data.nombre,
+        perfilUrl: data.perfil_url || data.perfilUrl,
+        aboutMeDescription: data.about_me_description || data.aboutMeDescription,
+        contactEmail: data.contact_email || data.contactEmail,
+      } as unknown as T;
+    }
+
+    throw new Error(`Endpoint no soportado: ${endpoint}`);
+  }
 
   /**
-   * Realiza un request con autenticación automática
+   * POST de recursos (crear/actualizar perfil)
    */
-  static async request<T>(
-    endpoint: string,
-    options: ApiRequestOptions = {}
-  ): Promise<T> {
-    const { 
-      method = 'GET', 
-      headers = {}, 
-      body
-    } = options;
+  static async post<T>(endpoint: string, body?: any): Promise<T> {
+    if (endpoint.includes('/profiles/create')) {
+      const { data: existing } = await supabase.from('presentador').select('id').limit(1).maybeSingle();
+      
+      const payload = {
+        nombre: body.nombre,
+        contact_email: body.contactEmail,
+        perfil_url: body.perfilUrl,
+        about_me_description: body.aboutMeDescription,
+      };
 
-    const url = `${this.API_BASE_URL}${endpoint}`;
-    const token = adminState.getToken();
+      let resData, resErr;
+      if (existing) {
+        ({ data: resData, error: resErr } = await supabase
+          .from('presentador')
+          .update(payload)
+          .eq('id', existing.id)
+          .select()
+          .single());
+      } else {
+        ({ data: resData, error: resErr } = await supabase
+          .from('presentador')
+          .insert(payload)
+          .select()
+          .single());
+      }
 
-    // Preparar headers
-    const finalHeaders: Record<string, string> = {
-      ...headers,
+      if (resErr) throw new Error(resErr.message);
+
+      // Disparar rebuild de Vercel tras guardar el perfil
+      await triggerVercelDeployHook();
+
+      return resData as unknown as T;
+    }
+
+    throw new Error(`Endpoint POST no soportado: ${endpoint}`);
+  }
+
+  /**
+   * Petición para crear / editar / eliminar proyectos
+   */
+  static async request<T>(endpoint: string, options: { method?: string; body?: any } = {}): Promise<T> {
+    const { method = 'GET', body } = options;
+
+    if (endpoint.includes('/projects/create')) {
+      const res = await this.handleProjectSave(null, body);
+      await triggerVercelDeployHook();
+      return res as unknown as T;
+    }
+
+    if (endpoint.includes('/projects/update/')) {
+      const id = endpoint.split('/projects/update/')[1];
+      const res = await this.handleProjectSave(id, body);
+      await triggerVercelDeployHook();
+      return res as unknown as T;
+    }
+
+    if (endpoint.includes('/projects/delete/') || (method === 'DELETE' && endpoint.includes('/projects/'))) {
+      const id = endpoint.split('/projects/delete/')[1] || endpoint.split('/').pop();
+      const { error } = await supabase.from('proyectos').delete().eq('id', id);
+      if (error) throw new Error(error.message);
+
+      await triggerVercelDeployHook();
+      return { success: true } as unknown as T;
+    }
+
+    throw new Error(`Operación no soportada: ${endpoint}`);
+  }
+
+  /**
+   * Guardar proyecto (crear o actualizar) con subida opcional a Supabase Storage
+   */
+  private static async handleProjectSave(id: string | null, body: FormData | any) {
+    let title = '';
+    let description = '';
+    let techSection = '';
+    let githubLink = '';
+    let liveDemoLink = '';
+    let imageFile: File | null = null;
+
+    if (body instanceof FormData) {
+      title = body.get('title') as string || '';
+      description = body.get('description') as string || '';
+      techSection = body.get('techSection') as string || '';
+      githubLink = body.get('githubLink') as string || '';
+      liveDemoLink = body.get('liveDemoLink') as string || '';
+      const fileCandidate = body.get('image');
+      if (fileCandidate && fileCandidate instanceof File && fileCandidate.size > 0) {
+        imageFile = fileCandidate;
+      }
+    } else {
+      title = body.title || '';
+      description = body.description || '';
+      techSection = body.techSection || '';
+      githubLink = body.githubLink || '';
+      liveDemoLink = body.liveDemoLink || '';
+    }
+
+    let imageSrc = '';
+    let storagePath = '';
+
+    if (imageFile) {
+      const timestamp = Date.now();
+      const sanitized = imageFile.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '');
+      const path = `projects/${timestamp}_${sanitized}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from('Images')
+        .upload(path, imageFile, { upsert: true, cacheControl: '31536000' });
+
+      if (uploadErr) {
+        throw new Error(`Error al subir imagen a Storage: ${uploadErr.message}`);
+      }
+
+      const { data: publicUrlData } = supabase.storage.from('Images').getPublicUrl(path);
+      imageSrc = publicUrlData.publicUrl;
+      storagePath = path;
+    }
+
+    const payload: Record<string, any> = {
+      title,
+      description,
+      techSection,
+      github_link: githubLink,
+      live_demo_link: liveDemoLink,
     };
 
-    // Agregar token si existe
-    if (token) {
-      finalHeaders['Authorization'] = `Bearer ${token}`;
+    if (imageSrc) {
+      payload.image_src = imageSrc;
+      payload.storage_path = storagePath;
     }
 
-    // No sobrescribir Content-Type si es FormData
-    if (!(body instanceof FormData)) {
-      finalHeaders['Content-Type'] = finalHeaders['Content-Type'] || 'application/json';
+    let data, error;
+    if (id) {
+      ({ data, error } = await supabase
+        .from('proyectos')
+        .update(payload)
+        .eq('id', id)
+        .select());
+    } else {
+      ({ data, error } = await supabase
+        .from('proyectos')
+        .insert([payload])
+        .select());
     }
 
-    // Realizar petición
-    const response = await fetch(url, {
-      method,
-      headers: finalHeaders,
-      body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
-    });
-
-    // Manejo de errores de autenticación
-    if (response.status === 401 || response.status === 403) {
-      const refreshToken = adminState.getRefreshToken();
-      // Si tenemos refresh token y este request no es ya una llamada a refresh-token
-      if (refreshToken && !endpoint.includes('/users/refresh-token')) {
-        try {
-          console.log('🔄 Token expirado detectado. Intentando renovación automática...');
-          const refreshUrl = `${this.API_BASE_URL}/users/refresh-token`;
-          const refreshRes = await fetch(refreshUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
-          });
-
-          if (refreshRes.ok) {
-            const refreshData = await refreshRes.json();
-            const newSession = refreshData.data;
-            if (newSession && newSession.session) {
-              const newToken = newSession.session.access_token;
-              const newRefreshToken = newSession.session.refresh_token;
-              const user = newSession.user;
-              adminState.setToken(newToken, newRefreshToken, user);
-              console.log('✅ Token renovado exitosamente. Re-intentando petición original...');
-
-              // Volver a intentar la petición original con el nuevo token
-              const retryHeaders = {
-                ...options.headers,
-                'Authorization': `Bearer ${newToken}`
-              };
-              return await this.request<T>(endpoint, {
-                ...options,
-                headers: retryHeaders
-              });
-            }
-          }
-        } catch (refreshError) {
-          console.error('❌ Error al intentar renovar el token:', refreshError);
-        }
-      }
-
-      adminState.clearSession();
-      if (typeof window !== 'undefined') {
-        window.location.href = '/admin?auth=required';
-      }
-      throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
-    }
-
-    if (!response.ok) {
-      let errorMessage = `Error ${response.status}: ${response.statusText}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.error || errorData.message || errorMessage;
-      } catch (e) {
-        // Si no es JSON, usar el statusText
-      }
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    const result = (data.data ?? data) as T;
-    return result;
+    if (error) throw new Error(error.message);
+    return data;
   }
 
-  /**
-   * GET request
-   */
-  static get<T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method'>) {
-    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  static async delete<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, { method: 'DELETE' });
   }
 
-  /**
-   * POST request
-   */
-  static post<T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
-    return this.request<T>(endpoint, { ...options, method: 'POST', body });
-  }
-
-  /**
-   * PATCH request
-   */
-  static patch<T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method' | 'body'>) {
-    return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
-  }
-
-  /**
-   * DELETE request
-   */
-  static delete<T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method'>) {
-    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
-  }
-
-  /**
-   * Invalida cache para un endpoint (No-op tras remover DataManager)
-   */
-  static invalidateCache(endpoint: string) {
-    // No-op: cache desactivado
-  }
-
-  /**
-   * Obtiene URL base (para debugging)
-   */
-  static getBaseUrl(): string {
-    return this.API_BASE_URL;
-  }
+  static invalidateCache(_endpoint: string) {}
 }

@@ -1,28 +1,28 @@
-// AuthMiddleware: Maneja autenticación y logout
-
+// AuthMiddleware: Maneja autenticación directamente con Supabase Auth
+// ponytail: auth directo usando supabase.auth.signInWithPassword y signOut
+import { supabase } from './supabase';
 import { adminState } from './adminState';
 
 export class AuthMiddleware {
   /**
-   * Realiza login
+   * Realiza login directamente con Supabase Auth
    */
   static async login(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
-    const API_BASE_URL = import.meta.env?.PUBLIC_API_URL || '';
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Error al iniciar sesión');
+    if (error) {
+      throw new Error(error.message || 'Error al iniciar sesión');
     }
 
-    const token = data.data.session.access_token;
-    const refreshToken = data.data.session.refresh_token;
-    const user = data.data.user;
+    const token = data.session.access_token;
+    const refreshToken = data.session.refresh_token;
+    const user = {
+      id: data.user.id,
+      email: data.user.email || '',
+    };
 
     adminState.setToken(token, refreshToken, user);
 
@@ -30,24 +30,14 @@ export class AuthMiddleware {
   }
 
   /**
-   * Realiza logout
+   * Realiza logout directamente con Supabase Auth
    */
   static async logout(): Promise<void> {
-    const token = adminState.getToken();
-    const API_BASE_URL = import.meta.env?.PUBLIC_API_URL || '';
-
     try {
-      // Usar el token ANTES de limpiar la sesión
-      if (token) {
-        await fetch(`${API_BASE_URL}/users/logout`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-      }
-    } catch (error) {
-      // Error al cerrar sesión - continuar de todas formas
+      await supabase.auth.signOut();
+    } catch {
+      // Ignorar errores de red en logout
     } finally {
-      // Limpiar sesión local después de intentar el logout
       adminState.clearSession();
     }
   }

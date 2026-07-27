@@ -1,17 +1,7 @@
-// Configuración de la API para SSG
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
+// Servicios de consulta directa a Supabase para el Frontend (SSG/Client)
+// ponytail: ordenamiento por fecha de creacion descendente y cliente Supabase directo
+import { supabase } from './supabase';
 
-// Variable global para rastrear el estado de la API
-let apiStatus: 'unknown' | 'available' | 'unavailable' = 'unknown';
-let profilePromise: Promise<Profile | null> | null = null;
-let projectsPromise: Promise<Project[]> | null = null;
-
-// Función para obtener el estado de la API
-export function getApiStatus() {
-  return apiStatus;
-}
-
-// Tipos TypeScript para los datos
 export interface Project {
   id: number;
   image_src?: string;
@@ -22,9 +12,9 @@ export interface Project {
   githubLink?: string;
   live_demo_link?: string;
   liveDemoLink?: string;
-  techSection?: string | string[]; // Cambiado de tech_section a techSection
-  created_at: string;
-  updated_at: string;
+  techSection?: string | string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Profile {
@@ -33,113 +23,105 @@ export interface Profile {
   perfilUrl: string;
   aboutMeDescription: string;
   contactEmail: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface ApiResponse<T> {
-  message: string;
-  data: T;
+let apiStatus: 'unknown' | 'available' | 'unavailable' = 'unknown';
+let profilePromise: Promise<Profile | null> | null = null;
+let projectsPromise: Promise<Project[]> | null = null;
+
+export function getApiStatus() {
+  return apiStatus;
 }
 
-// Función para obtener proyectos
 export async function getProjects(): Promise<Project[]> {
-  if (projectsPromise) {
-    return projectsPromise;
-  }
+  if (projectsPromise) return projectsPromise;
 
   projectsPromise = (async () => {
-  try {
-    console.log(`🔄 Intentando obtener proyectos desde: ${API_BASE_URL}/projects/read`);
-    
-    const response = await fetch(`${API_BASE_URL}/projects/read`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Timeout de 10 segundos para builds
-      signal: AbortSignal.timeout(10000)
-    });
+    try {
+      // Ordenar por fecha de creación descendente (el más reciente primero)
+      const { data, error } = await supabase
+        .from('proyectos')
+        .select('*')
+        .order('created_at', { ascending: false, nullsFirst: false });
 
-    if (!response.ok) {
-      console.warn(`⚠️ Error al obtener proyectos: ${response.status} ${response.statusText}`);
+      if (error) {
+        console.warn('⚠️ Error al consultar proyectos en Supabase:', error.message);
+        apiStatus = 'unavailable';
+        return fallbackProjects;
+      }
+
+      apiStatus = 'available';
+      const mapped = (data || []).map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        imageSrc: p.image_src,
+        image_src: p.image_src,
+        githubLink: p.github_link,
+        github_link: p.github_link,
+        liveDemoLink: p.live_demo_link,
+        live_demo_link: p.live_demo_link,
+        techSection: p.techSection || p.tech_section,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+      }));
+      return mapped;
+    } catch (err) {
+      console.error('❌ Excepción al conectar con Supabase (proyectos):', err);
       apiStatus = 'unavailable';
       return fallbackProjects;
     }
-
-    const apiResponse: ApiResponse<Project[]> = await response.json();
-    const projects = apiResponse.data || [];
-    
-    apiStatus = 'available';
-    console.log(`✅ ${projects.length} proyectos obtenidos desde la API`);
-    
-    return projects;
-  } catch (error) {
-    console.error('❌ Error al conectar con la API de proyectos:', error);
-    apiStatus = 'unavailable';
-    return fallbackProjects;
-  }
   })();
 
   return projectsPromise;
 }
 
-// Función para obtener perfil
 export async function getProfile(): Promise<Profile | null> {
-  if (profilePromise) {
-    return profilePromise;
-  }
+  if (profilePromise) return profilePromise;
 
   profilePromise = (async () => {
-  try {
-    console.log(`🔄 Intentando obtener perfil desde: ${API_BASE_URL}/profiles/read`);
-    
-    const response = await fetch(`${API_BASE_URL}/profiles/read`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Timeout de 10 segundos para builds
-      signal: AbortSignal.timeout(10000)
-    });
+    try {
+      const { data, error } = await supabase
+        .from('presentador')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
 
-    if (!response.ok) {
-      console.warn(`⚠️ Error al obtener perfil: ${response.status} ${response.statusText}`);
+      if (error) {
+        console.warn('⚠️ Error al consultar perfil en Supabase:', error.message);
+        apiStatus = 'unavailable';
+        return fallbackProfile;
+      }
+
+      if (!data) return fallbackProfile;
+
+      apiStatus = 'available';
+      return {
+        id: data.id,
+        nombre: data.nombre,
+        perfilUrl: data.perfil_url || data.perfilUrl,
+        aboutMeDescription: data.about_me_description || data.aboutMeDescription,
+        contactEmail: data.contact_email || data.contactEmail,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+      };
+    } catch (err) {
+      console.error('❌ Excepción al conectar con Supabase (perfil):', err);
       apiStatus = 'unavailable';
       return fallbackProfile;
     }
-
-    const apiResponse: ApiResponse<Profile> = await response.json();
-    const profile = apiResponse.data;
-    
-    if (!profile) {
-      console.log('ℹ️ No se encontró perfil en el backend, usando fallback');
-      return fallbackProfile;
-    }
-    
-    apiStatus = 'available';
-    console.log('✅ Perfil obtenido desde la API');
-    return profile;
-  } catch (error) {
-    console.error('❌ Error al conectar con la API de perfil:', error);
-    apiStatus = 'unavailable';
-    return fallbackProfile;
-  }
   })();
 
   return profilePromise;
 }
 
-// Función para formatear tecnologías desde tech_section
 export function formatTechnologies(techSection?: string | string[]): string[] {
   if (!techSection) return [];
-
-  // La API puede devolver un array directo
   if (Array.isArray(techSection)) {
     return techSection.map((tech) => String(tech).trim()).filter(Boolean);
   }
-
-  // Si es string JSON o CSV
   if (typeof techSection === 'string') {
     try {
       const parsed = JSON.parse(techSection);
@@ -147,58 +129,47 @@ export function formatTechnologies(techSection?: string | string[]): string[] {
         return parsed.map((tech) => String(tech).trim()).filter(Boolean);
       }
     } catch {
-      // Si no es JSON válido, divide por comas
       return techSection.split(',').map((tech) => tech.trim()).filter(Boolean);
     }
   }
-
   return [];
 }
 
-// Datos de fallback para desarrollo/cuando la API no esté disponible
 export const fallbackProjects: Project[] = [
   {
     id: 1,
     title: "E-commerce Platform",
-    description: "Una plataforma de comercio electrónico completa desarrollada con React y Node.js, que incluye gestión de productos, carrito de compras y sistema de pagos.",
+    description: "Plataforma de comercio electrónico con React y Node.js.",
     image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/ecommerce-platform",
     live_demo_link: "https://ecommerce-demo.example.com",
     techSection: '["React", "Node.js", "MongoDB", "Stripe"]',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
   },
   {
     id: 2,
     title: "Task Management App",
-    description: "Aplicación de gestión de tareas con funcionalidades de colaboración en tiempo real, notificaciones y seguimiento de progreso.",
+    description: "Aplicación de gestión de tareas en tiempo real.",
     image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/task-manager",
     live_demo_link: "https://taskmanager-demo.example.com",
     techSection: '["Vue.js", "Express", "Socket.io", "PostgreSQL"]',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
   },
   {
     id: 3,
     title: "Weather Dashboard",
-    description: "Dashboard meteorológico interactivo que muestra pronósticos en tiempo real con gráficos dinámicos y alertas personalizadas.",
+    description: "Dashboard meteorológico interactivo en tiempo real.",
     image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/weather-dashboard",
     techSection: '["JavaScript", "Chart.js", "OpenWeather API"]',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
   },
   {
     id: 4,
     title: "Portfolio Website",
-    description: "Sitio web de portafolio personal desarrollado con Astro y Tailwind CSS, optimizado para rendimiento y accesibilidad.",
+    description: "Sitio web de portafolio personal desarrollado con Astro.",
     image_src: "/logo_myt.svg",
     github_link: "https://github.com/MTDEV2312/portfolio",
     live_demo_link: "https://mathiasteran.dev",
     techSection: '["Astro", "Tailwind CSS", "TypeScript"]',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
   }
 ];
 
@@ -206,8 +177,6 @@ export const fallbackProfile: Profile = {
   id: 1,
   nombre: "Mathias Teran",
   perfilUrl: "/logo_myt.svg",
-  aboutMeDescription: "Soy un desarrollador FullStack apasionado por crear soluciones web innovadoras y eficientes. Me especializo en el desarrollo tanto del frontend como del backend, utilizando las tecnologías más actuales del mercado.",
+  aboutMeDescription: "Desarrollador FullStack apasionado por crear soluciones web innovadoras y eficientes.",
   contactEmail: "contacto@mathiasteran.dev",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString()
 };
