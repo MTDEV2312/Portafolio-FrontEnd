@@ -8,11 +8,12 @@
     "build:ssg": "astro check && astro build",
     "start": "astro preview",
     "preview": "astro preview",
-    "preview:build": "npm run build && npm run preview",
+    "preview:build": "pnpm build && pnpm preview",
     "clean": "node -e \"const fs = require('fs'); ['dist', '.astro'].forEach(d => fs.existsSync(d) && fs.rmSync(d, {recursive: true, force: true}))\"",
     "check": "astro check",
     "astro": "astro"
   },
+  "packageManager": "pnpm@11.18.0",
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@supabase/supabase-js": "^2.110.9",

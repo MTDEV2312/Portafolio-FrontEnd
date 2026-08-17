@@ -13,16 +13,16 @@ Guia rapida para agentes de codigo trabajando en este proyecto.
 
 Ejecutar desde la raiz del proyecto:
 
-- `npm install`
-- `npm run dev` - servidor local en puerto 4321.
-- `npm run check` - chequeo de tipos para Astro/TS.
-- `npm run build` - corre `astro check && astro build`.
-- `npm run preview` - sirve el build localmente.
-- `npm run clean` - limpia `dist` y `.astro`.
+- `pnpm install`
+- `pnpm dev` - servidor local en puerto 4321.
+- `pnpm check` - chequeo de tipos para Astro/TS.
+- `pnpm build` - corre `astro check && astro build`.
+- `pnpm preview` - sirve el build localmente.
+- `pnpm clean` - limpia `dist` y `.astro`.
 
 Notas:
 
-- `npm run build:production` apunta a `build-production.js`, archivo no presente en el repo. No usar salvo que se cree ese script.
+- `pnpm run build:production` apunta a `build-production.js`, archivo no presente en el repo. No usar salvo que se cree ese script.
 
 ## Mapa de arquitectura
 
