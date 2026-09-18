@@ -350,6 +350,7 @@ import Icons from '../components/admin/Icons.astro';
         import { adminState } from '../services/adminState';
         import { AuthMiddleware } from '../services/authMiddleware';
         import { ApiClient } from '../services/apiClient';
+        import { supabase } from '../services/supabase';
 
         // ApiClient maneja el API_BASE_URL automáticamente
         
@@ -368,6 +369,16 @@ import Icons from '../components/admin/Icons.astro';
             const container = document.getElementById(containerId);
             if (!container) return;
 
+            const textSpan = container.querySelector(`#${containerId}-text`);
+            if (textSpan) {
+                textSpan.textContent = message;
+                container.classList.remove('hidden');
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                }, duration);
+                return;
+            }
+
             const messageEl = document.createElement('div');
             messageEl.className = `bg-${isError ? 'error' : 'success'}/10 border border-${isError ? 'error' : 'success'}/20 text-${isError ? 'error' : 'success'} rounded-lg p-4 mb-6 message flex items-center space-x-2`;
             messageEl.innerHTML = `
@@ -379,9 +390,13 @@ import Icons from '../components/admin/Icons.astro';
             
             container.innerHTML = '';
             container.appendChild(messageEl);
+            container.classList.remove('hidden');
             
             setTimeout(() => {
                 messageEl.remove();
+                if (container.children.length === 0) {
+                    container.classList.add('hidden');
+                }
             }, duration);
         }
 
@@ -447,20 +462,53 @@ import Icons from '../components/admin/Icons.astro';
 
         if (adminState.isAuthenticated()) {
             showAdminPanel();
+        } else {
+            // Sincronizar automáticamente si Supabase ya cuenta con sesión activa en el navegador
+            supabase.auth.getSession().then(({ data }) => {
+                if (data?.session?.user) {
+                    adminState.setToken(data.session.access_token, data.session.refresh_token, {
+                        id: data.session.user.id,
+                        email: data.session.user.email || '',
+                    });
+                    showAdminPanel();
+                }
+            }).catch(() => {});
         }
 
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = (document.getElementById('email') as HTMLInputElement)?.value || '';
-                const password = (document.getElementById('password') as HTMLInputElement)?.value || '';
+                const emailInput = document.getElementById('email') as HTMLInputElement;
+                const passwordInput = document.getElementById('password') as HTMLInputElement;
+                const email = (emailInput?.value || '').trim();
+                const password = passwordInput?.value || '';
+
+                const submitBtn = loginForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Iniciando sesión...';
+                }
 
                 try {
                     await AuthMiddleware.login(email, password);
                     showMessage('login-success', 'Inicio de sesión exitoso');
-                    setTimeout(() => showAdminPanel(), 1000);
-                } catch (error) {
-                    showMessage('login-error', (error as Error).message, true);
+                    setTimeout(() => showAdminPanel(), 600);
+                } catch (error: any) {
+                    let errMsg = error?.message || 'Error al iniciar sesión';
+                    if (
+                        errMsg.toLowerCase().includes('invalid login credentials') ||
+                        errMsg.toLowerCase().includes('invalid_credentials')
+                    ) {
+                        errMsg = 'Credenciales inválidas. Verifica tu correo y contraseña registrados en Supabase Auth.';
+                    } else if (errMsg.toLowerCase().includes('email not confirmed')) {
+                        errMsg = 'El correo electrónico aún no ha sido confirmado en Supabase Auth.';
+                    }
+                    showMessage('login-error', errMsg, true);
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Iniciar Sesión';
+                    }
                 }
             });
         }
