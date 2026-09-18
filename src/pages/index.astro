@@ -1,29 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Hero from '../components/hero.astro';
-import About from '../components/about.astro';
-import Projects from '../components/projects.astro';
-import Contact from '../components/contact.astro';
-import Nav from '../layouts/nav.astro';
-import Footer from '../layouts/footer.astro';
+import PortfolioLayout from '../layouts/PortfolioLayout.astro';
+import App from '../components/portfolio/App';
+import { getPortfolioData } from '../services/portfolioService';
+
+const { projects, profile } = await getPortfolioData();
 ---
 
-<Layout>
-	<main class="relative min-h-screen">
-		<!-- Fondo SVG con overlay de colores de tu paleta -->
-		<div class="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-			<!-- Overlay con gradiente de tu paleta -->
-			<div class="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/60 to-primary/90"></div>
-		</div>
-		
-		<!-- Contenido principal -->
-		<div class="relative z-10">
-			<Nav />
-			<Hero />
-			<Projects />
-			<About />
-			<Contact />
-			<Footer />
-		</div>
-	</main>
-</Layout>
+<PortfolioLayout
+  title={`${profile.nombre} — Fullstack Software Developer`}
+  description={profile.aboutMeDescription}
+  image={profile.perfilUrl}
+>
+  <App client:load initialProjects={projects} profile={profile} />
+</PortfolioLayout>
