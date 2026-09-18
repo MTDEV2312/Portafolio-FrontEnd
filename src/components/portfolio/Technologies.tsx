@@ -1,5 +1,3 @@
-import { useIsMobile } from '../../hooks/useIsMobile';
-
 const CATEGORIES = [
   { name: 'Frontend',       items: ['React', 'Next.js', 'Astro', 'Vite', 'Tailwind CSS'] },
   { name: 'Backend',        items: ['Node.js', 'Express.js', 'NestJS', 'Flask'] },
@@ -9,14 +7,12 @@ const CATEGORIES = [
 ];
 
 export function Technologies() {
-  const isMobile = useIsMobile();
-
   return (
     <section
       className="section-border"
       style={{
-        minHeight: '100vh',
-        padding: isMobile ? '96px 24px 80px' : '120px 80px',
+        minHeight: '100svh',
+        padding: 'clamp(80px, 12vw, 120px) clamp(20px, 5.5vw, 80px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -30,7 +26,7 @@ export function Technologies() {
           display: 'flex',
           alignItems: 'center',
           gap: '14px',
-          marginBottom: isMobile ? '52px' : '72px',
+          marginBottom: 'clamp(36px, 5vw, 72px)',
         }}
       >
         <div
@@ -44,25 +40,11 @@ export function Technologies() {
         <h2 className="lbl-acid" style={{ margin: 0, fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit' }}>Technologies</h2>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)',
-          gap: isMobile ? '44px 20px' : '0',
-        }}
-      >
-        {CATEGORIES.map((cat, i) => (
+      <div className="tech-grid">
+        {CATEGORIES.map((cat) => (
           <div
             key={cat.name}
-            style={{
-              borderLeft:
-                isMobile
-                  ? i % 2 !== 0 ? '1px solid rgba(241,237,230,0.055)' : 'none'
-                  : i > 0 ? '1px solid rgba(241,237,230,0.055)' : 'none',
-              padding: isMobile
-                ? i % 2 !== 0 ? '0 0 0 20px' : '0 20px 0 0'
-                : '0 36px',
-            }}
+            className="tech-col"
           >
             <p
               style={{
@@ -71,7 +53,7 @@ export function Technologies() {
                 letterSpacing: '0.2em',
                 color: 'rgba(170,255,0,0.6)',
                 textTransform: 'uppercase',
-                marginBottom: '26px',
+                marginBottom: '20px',
               }}
             >
               {cat.name.toUpperCase()}
@@ -82,7 +64,7 @@ export function Technologies() {
                   key={item}
                   className="tech-item"
                   style={{
-                    fontSize: isMobile ? 'clamp(14px, 3.5vw, 18px)' : 'clamp(15px, 1.5vw, 24px)',
+                    fontSize: 'clamp(14px, 1.35vw, 22px)',
                   }}
                 >
                   {item}
@@ -99,8 +81,8 @@ export function Technologies() {
         style={{
           position: 'absolute',
           bottom: 0,
-          left: isMobile ? '24px' : '80px',
-          right: isMobile ? '24px' : '80px',
+          left: 'clamp(20px, 5.5vw, 80px)',
+          right: 'clamp(20px, 5.5vw, 80px)',
           height: '1px',
           background: 'linear-gradient(to right, transparent, rgba(170,255,0,0.1), transparent)',
         }}

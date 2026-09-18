@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useIsMobile } from '../../hooks/useIsMobile';
 
 /** Animated vertical line — decorative system element */
 function SystemLine({
@@ -27,9 +26,6 @@ export function Hero({
   name = 'MATHÍAS TERÁN',
   projectCount = 13,
 }: HeroProps) {
-  const isMobile = useIsMobile();
-  const pad = isMobile ? '0 24px' : '0 80px';
-
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,11 +57,11 @@ export function Hero({
   return (
     <section
       style={{
-        minHeight: '100vh',
+        minHeight: '100svh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: pad,
+        padding: '0 clamp(20px, 5.5vw, 80px)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -127,7 +123,7 @@ export function Hero({
             display: 'flex',
             alignItems: 'center',
             gap: '14px',
-            marginBottom: isMobile ? '36px' : '48px',
+            marginBottom: 'clamp(32px, 5vw, 48px)',
           }}
         >
           <div
@@ -145,14 +141,13 @@ export function Hero({
           style={{
             fontFamily: "'Bricolage Grotesque', sans-serif",
             fontWeight: 800,
-            fontSize: isMobile
-              ? 'clamp(60px, 17vw, 100px)'
-              : 'clamp(80px, 10.5vw, 170px)',
+            fontSize: 'clamp(46px, 12vw, 160px)',
             lineHeight: 0.88,
             letterSpacing: '-0.038em',
             color: '#F1EDE6',
-            marginBottom: isMobile ? '28px' : '48px',
+            marginBottom: 'clamp(24px, 4vw, 48px)',
             textTransform: 'uppercase',
+            wordBreak: 'break-word',
           }}
         >
           {firstName}
@@ -165,15 +160,15 @@ export function Hero({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: isMobile ? '12px' : '20px',
-            marginBottom: isMobile ? '28px' : '36px',
+            gap: 'clamp(10px, 2vw, 20px)',
+            marginBottom: 'clamp(24px, 3.5vw, 36px)',
             flexWrap: 'wrap',
           }}
         >
           <span
             style={{
               fontFamily: "'Space Mono', monospace",
-              fontSize: isMobile ? '9px' : '10px',
+              fontSize: 'clamp(8.5px, 1.2vw, 10px)',
               letterSpacing: '0.18em',
               color: 'rgba(241,237,230,0.4)',
               textTransform: 'uppercase',
@@ -191,7 +186,7 @@ export function Hero({
           <span
             style={{
               fontFamily: "'Space Mono', monospace",
-              fontSize: isMobile ? '8px' : '9px',
+              fontSize: 'clamp(8px, 1vw, 9px)',
               letterSpacing: '0.14em',
               color: 'rgba(241,237,230,0.22)',
               textTransform: 'uppercase',
@@ -205,10 +200,10 @@ export function Hero({
           style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 300,
-            fontSize: isMobile ? '14px' : '17px',
+            fontSize: 'clamp(14px, 1.8vw, 17px)',
             lineHeight: 1.7,
             color: 'rgba(241,237,230,0.44)',
-            maxWidth: '360px',
+            maxWidth: 'min(360px, 100%)',
           }}
         >
           Building web applications,
@@ -217,41 +212,42 @@ export function Hero({
         </p>
       </div>
 
-      {/* Ghost number — decorative right */}
-      {!isMobile && (
+      {/* Ghost number — decorative right, hidden on mobile */}
+      <div
+        aria-hidden
+        className="hide-mobile"
+        style={{
+          position: 'absolute',
+          right: '40px',
+          bottom: '48px',
+          zIndex: 1,
+          textAlign: 'right',
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
         <div
-          aria-hidden
           style={{
-            position: 'absolute',
-            right: '40px',
-            bottom: '48px',
-            zIndex: 1,
-            textAlign: 'right',
+            fontFamily: "'Bricolage Grotesque', sans-serif",
+            fontWeight: 800,
+            fontSize: 'clamp(100px, 18vw, 220px)',
+            lineHeight: 1,
+            letterSpacing: '-0.055em',
+            color: 'rgba(241,237,230,0.03)',
           }}
         >
-          <div
-            style={{
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontWeight: 800,
-              fontSize: 'clamp(100px, 18vw, 220px)',
-              lineHeight: 1,
-              letterSpacing: '-0.055em',
-              color: 'rgba(241,237,230,0.03)',
-            }}
-          >
-            {projectCount}
-          </div>
-          <p className="lbl-mono" style={{ marginTop: '-8px' }}>Projects</p>
+          {projectCount}
         </div>
-      )}
+        <p className="lbl-mono" style={{ marginTop: '-8px' }}>Projects</p>
+      </div>
 
       {/* Scroll cue */}
       <div
         ref={scrollIndicatorRef}
         style={{
           position: 'absolute',
-          bottom: isMobile ? '32px' : '44px',
-          left: isMobile ? '24px' : '80px',
+          bottom: 'clamp(24px, 4vw, 44px)',
+          left: 'clamp(20px, 5.5vw, 80px)',
           display: 'flex',
           alignItems: 'center',
           gap: '14px',
@@ -268,27 +264,28 @@ export function Hero({
         <p className="lbl-mono" style={{ fontSize: '8px' }}>Scroll to explore</p>
       </div>
 
-      {/* Coordinates */}
-      {!isMobile && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            bottom: '44px',
-            right: '80px',
-            fontFamily: "'Space Mono', monospace",
-            fontSize: '8px',
-            letterSpacing: '0.1em',
-            color: 'rgba(241,237,230,0.1)',
-            zIndex: 1,
-            lineHeight: 1.6,
-            textAlign: 'right',
-          }}
-        >
-          <div>40.4168° N</div>
-          <div>3.7038° W</div>
-        </div>
-      )}
+      {/* Coordinates — hidden on mobile */}
+      <div
+        aria-hidden
+        className="hide-mobile"
+        style={{
+          position: 'absolute',
+          bottom: '44px',
+          right: '80px',
+          fontFamily: "'Space Mono', monospace",
+          fontSize: '8px',
+          letterSpacing: '0.1em',
+          color: 'rgba(241,237,230,0.1)',
+          zIndex: 1,
+          lineHeight: 1.6,
+          textAlign: 'right',
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
+        <div>40.4168° N</div>
+        <div>3.7038° W</div>
+      </div>
     </section>
   );
 }

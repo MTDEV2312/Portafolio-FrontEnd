@@ -67,17 +67,17 @@ import Icons from '../components/admin/Icons.astro';
         <!-- Header -->
         <div class="bg-card border-b border-border shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-primary rounded-lg">
+                        <div class="p-2 bg-primary rounded-lg shrink-0">
                             <Icons icon="gear" size="lg" class="text-primary-foreground" />
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-primary">Panel de Administración</h1>
-                            <p class="text-muted-foreground text-sm">Gestiona tu portfolio de manera eficiente</p>
+                            <h1 class="text-xl sm:text-2xl font-bold text-primary">Panel de Administración</h1>
+                            <p class="text-muted-foreground text-xs sm:text-sm">Gestiona tu portfolio de manera eficiente</p>
                         </div>
                     </div>
-                    <button id="logout-btn" class="hidden bg-error text-error-foreground px-4 py-2 rounded-lg hover:bg-error/90 transition-colors text-sm font-medium flex items-center space-x-2">
+                    <button id="logout-btn" class="hidden bg-error text-error-foreground px-4 py-2 rounded-lg hover:bg-error/90 transition-colors text-sm font-medium flex items-center space-x-2 shrink-0">
                         <Icons icon="logout" size="sm" />
                         <span>Cerrar Sesión</span>
                     </button>
@@ -86,14 +86,14 @@ import Icons from '../components/admin/Icons.astro';
         </div>
 
         <!-- Auth Section -->
-        <div id="auth-section" class="max-w-md mx-auto mt-12 px-4">
-            <div class="bg-card rounded-xl shadow border border-border p-8">
-                <div class="text-center mb-8">
-                    <div class="p-3 bg-primary/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+        <div id="auth-section" class="max-w-md mx-auto mt-8 sm:mt-12 px-4">
+            <div class="bg-card rounded-xl shadow border border-border p-6 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="p-3 bg-primary/10 rounded-full w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
                         <Icons icon="lock" size="lg" class="text-primary" />
                     </div>
-                    <h2 class="text-2xl font-bold text-card-foreground">Iniciar Sesión</h2>
-                    <p class="text-muted-foreground text-sm mt-2">Accede al panel de administración</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-card-foreground">Iniciar Sesión</h2>
+                    <p class="text-muted-foreground text-xs sm:text-sm mt-1 sm:mt-2">Accede al panel de administración</p>
                 </div>
                 
                 <div id="login-error" class="hidden bg-error/10 border border-error/20 text-error rounded-lg p-4 mb-6 message">
@@ -121,7 +121,7 @@ import Icons from '../components/admin/Icons.astro';
                         <input type="password" id="password" required 
                                class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-input text-sm">
                     </div>
-                    <button type="submit" class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
+                    <button type="submit" class="w-full bg-primary text-primary-foreground py-2.5 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm min-h-[44px]">
                         Iniciar Sesión
                     </button>
                 </form>
@@ -129,22 +129,22 @@ import Icons from '../components/admin/Icons.astro';
         </div>
 
         <!-- Admin Panel -->
-        <div id="admin-panel" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div id="admin-panel" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
                 <!-- Sidebar -->
                 <div class="lg:col-span-1">
-                    <div class="bg-card rounded-lg shadow border border-border p-4 sticky top-8">
-                        <h3 class="text-lg font-semibold text-card-foreground mb-4">Navegación</h3>
-                        <nav class="space-y-2">
-                            <button class="nav-btn active w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 bg-primary text-primary-foreground text-sm font-medium" data-section="dashboard">
+                    <div class="bg-card rounded-lg shadow border border-border p-3 sm:p-4 sticky top-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-card-foreground mb-3 sm:mb-4">Navegación</h3>
+                        <nav class="flex flex-row overflow-x-auto gap-2 pb-2 lg:pb-0 lg:flex-col lg:space-y-2 lg:gap-0">
+                            <button class="nav-btn active whitespace-nowrap text-left px-4 py-2.5 rounded-lg transition-colors flex items-center space-x-2 bg-primary text-primary-foreground text-sm font-medium shrink-0 lg:w-full min-h-[44px]" data-section="dashboard">
                                 <Icons icon="tachometer" size="md" />
                                 <span>Dashboard</span>
                             </button>
-                            <button class="nav-btn w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 text-muted-foreground hover:bg-muted hover:text-card-foreground text-sm font-medium" data-section="profile">
+                            <button class="nav-btn whitespace-nowrap text-left px-4 py-2.5 rounded-lg transition-colors flex items-center space-x-2 text-muted-foreground hover:bg-muted hover:text-card-foreground text-sm font-medium shrink-0 lg:w-full min-h-[44px]" data-section="profile">
                                 <Icons icon="user" size="md" />
                                 <span>Perfil</span>
                             </button>
-                            <button class="nav-btn w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 text-muted-foreground hover:bg-muted hover:text-card-foreground text-sm font-medium" data-section="projects">
+                            <button class="nav-btn whitespace-nowrap text-left px-4 py-2.5 rounded-lg transition-colors flex items-center space-x-2 text-muted-foreground hover:bg-muted hover:text-card-foreground text-sm font-medium shrink-0 lg:w-full min-h-[44px]" data-section="projects">
                                 <Icons icon="folder" size="md" />
                                 <span>Proyectos</span>
                             </button>
@@ -156,8 +156,8 @@ import Icons from '../components/admin/Icons.astro';
                 <div class="lg:col-span-3">
                     <!-- Dashboard Section -->
                     <div id="dashboard" class="section">
-                        <div class="bg-card rounded-lg shadow border border-border p-8">
-                            <h2 class="text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
+                        <div class="bg-card rounded-lg shadow border border-border p-4 sm:p-6 lg:p-8">
+                            <h2 class="text-xl sm:text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
                                 <Icons icon="tachometer" size="lg" class="text-primary" />
                                 <span>Dashboard</span>
                             </h2>
@@ -166,20 +166,20 @@ import Icons from '../components/admin/Icons.astro';
                             </div>
                             <div id="stats" class="hidden">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-primary text-primary-foreground p-6 rounded-lg">
+                                    <div class="bg-primary text-primary-foreground p-5 sm:p-6 rounded-lg">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <h3 id="total-projects" class="text-3xl font-bold">0</h3>
-                                                <p class="text-primary-foreground/80 text-sm">Proyectos Totales</p>
+                                                <h3 id="total-projects" class="text-2xl sm:text-3xl font-bold">0</h3>
+                                                <p class="text-primary-foreground/80 text-xs sm:text-sm">Proyectos Totales</p>
                                             </div>
                                             <Icons icon="folder" size="xl" class="text-primary-foreground/60" />
                                         </div>
                                     </div>
-                                    <div class="bg-success text-success-foreground p-6 rounded-lg">
+                                    <div class="bg-success text-success-foreground p-5 sm:p-6 rounded-lg">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <h3 id="profile-status" class="text-xl font-semibold">No configurado</h3>
-                                                <p class="text-success-foreground/80 text-sm">Estado del Perfil</p>
+                                                <h3 id="profile-status" class="text-lg sm:text-xl font-semibold">No configurado</h3>
+                                                <p class="text-success-foreground/80 text-xs sm:text-sm">Estado del Perfil</p>
                                             </div>
                                             <Icons icon="user" size="xl" class="text-success-foreground/60" />
                                         </div>
@@ -191,8 +191,8 @@ import Icons from '../components/admin/Icons.astro';
 
                     <!-- Profile Section -->
                     <div id="profile" class="section hidden">
-                        <div class="bg-card rounded-lg shadow border border-border p-8">
-                            <h2 class="text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
+                        <div class="bg-card rounded-lg shadow border border-border p-4 sm:p-6 lg:p-8">
+                            <h2 class="text-xl sm:text-2xl font-bold text-card-foreground mb-6 flex items-center space-x-3">
                                 <Icons icon="user" size="lg" class="text-primary" />
                                 <span>Gestión de Perfil</span>
                             </h2>
@@ -205,7 +205,7 @@ import Icons from '../components/admin/Icons.astro';
                             
                             <div id="profile-content" class="hidden space-y-6">
                                 <form id="profile-form" class="space-y-6">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                         <div>
                                             <label for="nombre" class="block text-sm font-medium text-card-foreground mb-2">Nombre</label>
                                             <input type="text" id="nombre" required 
@@ -236,7 +236,7 @@ import Icons from '../components/admin/Icons.astro';
                                                   placeholder="Cuéntame sobre ti..."></textarea>
                                         <span id="aboutMeDescription-error" class="hidden text-error text-xs mt-1 block"></span>
                                     </div>
-                                    <button type="submit" class="bg-success text-success-foreground py-2 px-6 rounded-lg hover:bg-success/90 transition-colors font-medium text-sm flex items-center space-x-2">
+                                    <button type="submit" class="bg-success text-success-foreground py-2.5 px-6 rounded-lg hover:bg-success/90 transition-colors font-medium text-sm flex items-center space-x-2 min-h-[44px]">
                                         <Icons icon="check" size="md" />
                                         <span>Guardar Perfil</span>
                                     </button>
@@ -247,13 +247,13 @@ import Icons from '../components/admin/Icons.astro';
 
                     <!-- Projects Section -->
                     <div id="projects" class="section hidden">
-                        <div class="bg-card rounded-lg shadow border border-border p-8">
+                        <div class="bg-card rounded-lg shadow border border-border p-4 sm:p-6 lg:p-8">
                             <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-2xl font-bold text-card-foreground flex items-center space-x-3">
+                                <h2 class="text-xl sm:text-2xl font-bold text-card-foreground flex items-center space-x-3">
                                     <Icons icon="folder" size="lg" class="text-primary" />
                                     <span>Gestión de Proyectos</span>
                                 </h2>
-                                <button id="new-project-btn" class="bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm flex items-center space-x-2">
+                                <button id="new-project-btn" class="bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm flex items-center space-x-2 min-h-[40px]">
                                     <Icons icon="plus" size="md" />
                                     <span>Nuevo</span>
                                 </button>
@@ -262,7 +262,7 @@ import Icons from '../components/admin/Icons.astro';
                             <div id="projects-messages"></div>
 
                             <!-- Project Form (Hidden by default) -->
-                            <div id="project-form-container" class="hidden bg-muted rounded-lg p-6 mb-8 border border-border">
+                            <div id="project-form-container" class="hidden bg-muted rounded-lg p-4 sm:p-6 mb-8 border border-border">
                                 <h3 id="project-form-title" class="text-lg font-semibold text-card-foreground mb-6">Nuevo Proyecto</h3>
                                 <form id="project-form" class="space-y-6">
                                     <input type="hidden" id="project-id">
@@ -679,7 +679,7 @@ import Icons from '../components/admin/Icons.astro';
             const paginatedProjects = (allProjects as any[]).slice(start, end);
             const totalPages = Math.ceil(allProjects.length / PROJECTS_PER_PAGE);
 
-            let html = '<div class="overflow-x-auto"><table class="w-full"><thead><tr class="border-b border-border"><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Proyecto</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Tecnologías</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Fecha</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Acciones</th></tr></thead><tbody>';
+            let html = '<div class="overflow-x-auto -mx-4 sm:mx-0"><table class="w-full min-w-[560px]"><thead><tr class="border-b border-border"><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Proyecto</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Tecnologías</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Fecha</th><th class="text-left py-3 px-4 font-semibold text-card-foreground text-sm">Acciones</th></tr></thead><tbody>';
 
             if (paginatedProjects.length === 0) {
                 html += '<tr><td colspan="4" class="text-center py-8 text-muted-foreground text-sm">No hay proyectos. ¡Crea tu primer proyecto!</td></tr>';
@@ -691,10 +691,10 @@ import Icons from '../components/admin/Icons.astro';
                         <tr>
                             <td class="py-3 px-4"><span class="font-medium text-card-foreground text-sm">${project.title}</span></td>
                             <td class="py-3 px-4"><span class="text-xs text-muted-foreground">${(project.tech_section || '').split(',').slice(0, 2).join(', ')}</span></td>
-                            <td class="py-3 px-4 text-sm text-muted-foreground">${date}</td>
-                            <td class="py-3 px-4 space-x-2">
-                                <button class="text-xs px-2 py-1 bg-warning text-warning-foreground rounded hover:bg-warning/90 transition-colors edit-project-btn" data-project-index="${absoluteIndex}">Editar</button>
-                                <button class="text-xs px-2 py-1 bg-error text-error-foreground rounded hover:bg-error/90 transition-colors delete-project-btn" data-project-index="${absoluteIndex}">Eliminar</button>
+                            <td class="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">${date}</td>
+                            <td class="py-3 px-4 space-x-2 whitespace-nowrap">
+                                <button class="text-xs px-3 py-1.5 min-h-[32px] bg-warning text-warning-foreground rounded hover:bg-warning/90 transition-colors edit-project-btn font-medium inline-flex items-center" data-project-index="${absoluteIndex}">Editar</button>
+                                <button class="text-xs px-3 py-1.5 min-h-[32px] bg-error text-error-foreground rounded hover:bg-error/90 transition-colors delete-project-btn font-medium inline-flex items-center" data-project-index="${absoluteIndex}">Eliminar</button>
                             </td>
                         </tr>
                     `;
