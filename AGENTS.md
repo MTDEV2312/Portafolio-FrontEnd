@@ -5,8 +5,10 @@ Guia rapida para agentes de codigo trabajando en este proyecto.
 ## Stack y objetivo
 
 - Astro 5 con salida estatica (SSG).
+- React 19 vía @astrojs/react para componentes interactivos del portfolio.
 - Tailwind CSS v4 via Vite.
 - TypeScript estricto.
+- Supabase como PaaS / BaaS exclusivo (sin backend en Render).
 - Deploy en Vercel.
 
 ## Comandos principales
@@ -27,36 +29,40 @@ Notas:
 ## Mapa de arquitectura
 
 - `src/pages/`: rutas Astro (`index.astro`, `admin.astro`).
-- `src/layouts/`: layout global y secciones compartidas (`Layout.astro`, `nav.astro`, `footer.astro`).
-- `src/components/`: componentes de UI para el sitio publico.
+- `src/layouts/`: layout global y secciones compartidas (`Layout.astro` para admin, `PortfolioLayout.astro` para landing).
+- `src/components/`: componentes de UI para el sitio publico y admin.
+- `src/components/portfolio/`: componentes interactivos React 19 de la nueva UI (`App.tsx`, `Hero.tsx`, `ProjectScene.tsx`, etc.).
 - `src/components/admin/`: componentes exclusivos del panel admin.
-- `src/services/`: logica de datos/autenticacion/estado del panel admin.
-- `src/styles/global.css`: Tailwind v4 + tokens de tema (`@theme`).
+- `src/services/`: logica de datos/autenticacion/estado con Supabase.
+- `src/styles/portfolio.css`: Tailwind v4 + tokens de la nueva UI editorial.
+- `src/styles/global.css`: Tailwind v4 + tokens semanticos del panel admin.
 - `public/`: archivos estaticos servidos sin procesamiento.
 
 ## Convenciones del proyecto
 
-- Componentes en `.astro`; servicios en `.ts` dentro de `src/services/`.
+- Landing publica orquestada con Astro SSG y React 19 (`client:load`).
+- Componentes en `.astro` y `.tsx`; servicios en `.ts` dentro de `src/services/`.
 - Nombres de tipos/interfaces en PascalCase; props/campos en camelCase.
 - Mantener responsabilidades claras:
   - UI en `src/components/` y `src/layouts/`.
-  - acceso a API, auth y cache en `src/services/`.
+  - acceso a base de datos y auth en `src/services/` (Supabase).
 - Reutilizar estado y cache existentes antes de introducir nuevas soluciones.
 
 ## Flujo de datos y estado admin
 
-- `src/services/api.ts`: fetch para datos del portfolio y fallback para SSG.
-- `src/services/apiClient.ts`: cliente HTTP central con token Bearer cuando existe.
+- `src/data/projects.ts`: catalogo tipado de proyectos para la nueva UI de alta fidelidad.
+- `src/services/api.ts`: consultas a Supabase y fallbacks para SSG.
+- `src/services/supabase.ts`: cliente oficial de Supabase.
 - `src/services/adminState.ts`: singleton de estado admin + cache con TTL.
 - `src/services/dataManager.ts`: cache y deduplicacion de requests.
-- `src/services/authMiddleware.ts`: login/logout/guardas de autenticacion.
+- `src/services/authMiddleware.ts`: login/logout/guardas de autenticacion con Supabase.
 
 ## Gotchas importantes
 
-- Requiere `PUBLIC_API_URL` para requests; revisar `.env.example`.
-- Durante build SSG puede ejecutarse fetch de datos: no romper ese flujo con dependencias solo de browser.
-- `localStorage` y `window` existen solo en cliente: proteger uso en codigo compartido.
-- En dev existe proxy `/api` definido en `astro.config.mjs`; en produccion hay rewrite en `vercel.json`.
+- Backend en Render ya no existe; el proyecto utiliza exclusivamente Supabase.
+- Durante build SSG se renderiza el HTML completo en servidor (islas hidratan con `client:load`).
+- `useIsMobile.ts` esta optimizado para SSR (inicializa en `false` y sincroniza en `useEffect`).
+- `localStorage` y `window` existen solo en cliente: proteger su uso fuera del ciclo de montaje.
 
 ## Archivos clave para consultar
 

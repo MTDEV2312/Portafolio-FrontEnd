@@ -9,12 +9,16 @@ export class AuthMiddleware {
    */
   static async login(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
     if (error) {
       throw new Error(error.message || 'Error al iniciar sesión');
+    }
+
+    if (!data?.session || !data?.user) {
+      throw new Error('No se pudo establecer la sesión');
     }
 
     const token = data.session.access_token;

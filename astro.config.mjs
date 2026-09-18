@@ -1,42 +1,34 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
   // Configuración de SSG (Static Site Generation)
-  output: 'static', // Genera un sitio completamente estático
+  output: 'static',
   
   // Configuración de build
   build: {
-    // Genera archivos HTML estáticos
     inlineStylesheets: 'auto'
   },
   
   // Configuración de Vite
   vite: {
     plugins: [tailwindcss()],
-    // Configuración para optimizar el build
     build: {
       rollupOptions: {
         output: {
-          // Optimizar chunks para mejor cacheo
           manualChunks: undefined,
         }
-      }
-    },
-    // Configuración del servidor de desarrollo  
-    server: {
-      proxy: {
-        '/api': 'https://backend-portafolio-q0ig.onrender.com'
       }
     }
   },
 
-  // Configuración de integración
-  integrations: [],
+  // Integraciones de Astro
+  integrations: [react()],
   
-  // Configuración de servidor de desarrollo
+  // Servidor local de desarrollo
   server: {
     port: 4321,
     host: true

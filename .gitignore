@@ -26,3 +26,6 @@ pnpm-debug.log*
 .claude
 CLAUDE.md
 .tmp-lighthouse/
+
+# test-results
+NuevaUI/
