@@ -44,11 +44,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://www.math
     <meta property="og:image" content={new URL(image, canonicalURL)} />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={new URL(image, canonicalURL)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, canonicalURL)} />
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify({

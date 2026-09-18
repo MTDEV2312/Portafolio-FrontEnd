@@ -459,18 +459,39 @@ import Icons from '../components/admin/Icons.astro';
         const adminPanel = document.getElementById('admin-panel');
         const loginForm = document.getElementById('login-form');
         const logoutBtn = document.getElementById('logout-btn');
+        const rawAdminEmails = (import.meta.env.PUBLIC_ADMIN_EMAILS || import.meta.env.PUBLIC_ADMIN_EMAIL || '') as string;
+        const ADMIN_EMAILS = rawAdminEmails
+            .split(',')
+            .map((email: string) => email.toLowerCase().trim())
+            .filter(Boolean);
+
+        function isAuthorizedAdmin(email?: string | null): boolean {
+            if (!email || ADMIN_EMAILS.length === 0) return false;
+            return ADMIN_EMAILS.includes(email.toLowerCase().trim());
+        }
 
         if (adminState.isAuthenticated()) {
-            showAdminPanel();
+            const currentSession = adminState.getSession();
+            if (isAuthorizedAdmin(currentSession?.user?.email)) {
+                showAdminPanel();
+            } else {
+                adminState.clearSession();
+                showAuthSection();
+            }
         } else {
             // Sincronizar automáticamente si Supabase ya cuenta con sesión activa en el navegador
             supabase.auth.getSession().then(({ data }) => {
-                if (data?.session?.user) {
-                    adminState.setToken(data.session.access_token, data.session.refresh_token, {
-                        id: data.session.user.id,
-                        email: data.session.user.email || '',
+                const session = data?.session;
+                const user = session?.user;
+                if (session && user && isAuthorizedAdmin(user.email)) {
+                    adminState.setToken(session.access_token, session.refresh_token, {
+                        id: user.id,
+                        email: user.email || '',
                     });
                     showAdminPanel();
+                } else if (user && !isAuthorizedAdmin(user.email)) {
+                    supabase.auth.signOut().catch(() => {});
+                    adminState.clearSession();
                 }
             }).catch(() => {});
         }
@@ -490,7 +511,11 @@ import Icons from '../components/admin/Icons.astro';
                 }
 
                 try {
-                    await AuthMiddleware.login(email, password);
+                    const { user } = await AuthMiddleware.login(email, password);
+                    if (!isAuthorizedAdmin(user.email)) {
+                        await AuthMiddleware.logout();
+                        throw new Error('Acceso no autorizado. Este usuario no cuenta con privilegios de administrador.');
+                    }
                     showMessage('login-success', 'Inicio de sesión exitoso');
                     setTimeout(() => showAdminPanel(), 600);
                 } catch (error: any) {

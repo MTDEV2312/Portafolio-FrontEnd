@@ -119,7 +119,17 @@ function Desc({ text, maxWidth = '400px' }: { text: string; maxWidth?: string })
   );
 }
 
-function BrowserImg({ src, alt, height }: { src: string; alt: string; height: string | number }) {
+function BrowserImg({
+  src,
+  alt,
+  height,
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  height: string | number;
+  priority?: boolean;
+}) {
   return (
     <div className="img-wrap" style={{ height, display: 'flex', flexDirection: 'column' }}>
       <div className="browser-bar">
@@ -138,18 +148,40 @@ function BrowserImg({ src, alt, height }: { src: string; alt: string; height: st
       </div>
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
         <div className="par-img">
-          <img src={src} alt={alt} />
+          <img
+            src={src}
+            alt={alt}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function PlainImg({ src, alt, height, style }: { src: string; alt: string; height: string | number; style?: React.CSSProperties }) {
+function PlainImg({
+  src,
+  alt,
+  height,
+  style,
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  height: string | number;
+  style?: React.CSSProperties;
+  priority?: boolean;
+}) {
   return (
     <div className="img-wrap" style={{ height, position: 'relative', overflow: 'hidden', ...style }}>
       <div className="par-img">
-        <img src={src} alt={alt} />
+        <img
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+        />
       </div>
     </div>
   );
@@ -524,7 +556,7 @@ function SeatGrid() {
 // ─────────────────────────────────────────────
 
 /** Layout A — Ghost num left · title center · browser screenshot right */
-function LayoutA({ p }: { p: Project }) {
+function LayoutA({ p, totalProjects = 13 }: { p: Project; totalProjects?: number }) {
   return (
     <div
       style={{
@@ -582,7 +614,7 @@ function LayoutA({ p }: { p: Project }) {
 
       {/* Browser screenshot — col 3 */}
       <div style={{ gridColumn: '3', height: 'clamp(340px, 54vh, 580px)', zIndex: 1 }}>
-        <BrowserImg src={p.image} alt={p.imageAlt} height="100%" />
+        <BrowserImg src={p.image} alt={p.imageAlt} height="100%" priority={p.id === 1} />
       </div>
 
       {/* Counter */}
@@ -595,7 +627,7 @@ function LayoutA({ p }: { p: Project }) {
           fontSize: '8px',
         }}
       >
-        {p.num} / 13
+        {p.num} / {String(totalProjects).padStart(2, '0')}
       </p>
     </div>
   );
@@ -618,6 +650,8 @@ function LayoutB({ p }: { p: Project }) {
           <img
             src={p.image}
             alt={p.imageAlt}
+            loading={p.id === 1 ? 'eager' : 'lazy'}
+            decoding="async"
             style={{
               width: '100%',
               height: '100%',
@@ -763,7 +797,7 @@ function LayoutC({ p }: { p: Project }) {
           marginTop: '48px',
         }}
       >
-        <PlainImg src={p.image} alt={p.imageAlt} height="clamp(260px, 38vh, 460px)" />
+        <PlainImg src={p.image} alt={p.imageAlt} height="clamp(260px, 38vh, 460px)" priority={p.id === 1} />
         <div style={{ paddingBottom: '8px' }}>
           <Desc text={p.description} />
           <Tags items={p.technologies} />
@@ -795,6 +829,8 @@ function LayoutD({ p }: { p: Project }) {
           <img
             src={p.image}
             alt={p.imageAlt}
+            loading={p.id === 1 ? 'eager' : 'lazy'}
+            decoding="async"
             style={{
               width: '100%',
               height: '100%',
@@ -936,7 +972,12 @@ function LayoutE({ p }: { p: Project }) {
         ) : (
           <div style={{ position: 'relative', height: '100%' }}>
             <div className="par-img" style={{ inset: 0 }}>
-              <img src={p.image} alt={p.imageAlt} />
+              <img
+                src={p.image}
+                alt={p.imageAlt}
+                loading={p.id === 1 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
             </div>
           </div>
         )}
@@ -1058,7 +1099,12 @@ function LayoutF({ p }: { p: Project }) {
             <ArViz />
           ) : (
             <div className="par-img">
-              <img src={p.image} alt={p.imageAlt} />
+              <img
+                src={p.image}
+                alt={p.imageAlt}
+                loading={p.id === 1 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
             </div>
           )}
         </div>
@@ -1090,6 +1136,8 @@ function LayoutG({ p }: { p: Project }) {
           <img
             src={p.image}
             alt={p.imageAlt}
+            loading={p.id === 1 ? 'eager' : 'lazy'}
+            decoding="async"
             style={{
               width: '100%',
               height: '100%',
@@ -1286,7 +1334,12 @@ function MobileLayout({ p }: { p: Project }) {
         ) : (
           <div className="img-wrap" style={{ height: '220px' }}>
             <div className="par-img">
-              <img src={p.image} alt={p.imageAlt} />
+              <img
+                src={p.image}
+                alt={p.imageAlt}
+                loading={p.id === 1 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
             </div>
           </div>
         )}
@@ -1312,10 +1365,11 @@ function MobileLayout({ p }: { p: Project }) {
 
 interface Props {
   project: Project;
+  totalProjects?: number;
   onActive: (id: number) => void;
 }
 
-export function ProjectScene({ project: p, onActive }: Props) {
+export function ProjectScene({ project: p, totalProjects, onActive }: Props) {
   const ref = useRef<HTMLElement>(null);
   const isMobile = useIsMobile();
 
@@ -1362,7 +1416,7 @@ export function ProjectScene({ project: p, onActive }: Props) {
         <MobileLayout p={p} />
       ) : (
         <>
-          {p.layout === 'A' && <LayoutA p={p} />}
+          {p.layout === 'A' && <LayoutA p={p} totalProjects={totalProjects} />}
           {p.layout === 'B' && <LayoutB p={p} />}
           {p.layout === 'C' && <LayoutC p={p} />}
           {p.layout === 'D' && <LayoutD p={p} />}

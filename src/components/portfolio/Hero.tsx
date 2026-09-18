@@ -36,6 +36,12 @@ export function Hero({
     // Subtle pulse on scroll indicator
     const el = scrollIndicatorRef.current;
     if (!el) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.style.opacity = '0.35';
+      return;
+    }
+
     let frame: number;
     let t = 0;
     const animate = () => {

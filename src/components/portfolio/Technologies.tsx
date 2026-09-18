@@ -41,7 +41,7 @@ export function Technologies() {
             opacity: 0.6,
           }}
         />
-        <p className="lbl-acid">Technologies</p>
+        <h2 className="lbl-acid" style={{ margin: 0, fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit' }}>Technologies</h2>
       </div>
 
       <div
