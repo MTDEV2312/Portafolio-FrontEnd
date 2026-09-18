@@ -8,14 +8,7 @@ let profile: Profile;
 try {
   // Intentar obtener datos del backend
   const apiProfile = await getProfile();
-  
-  if (!apiProfile) {
-    console.log('⚠️ No se encontró perfil desde la API para hero, usando datos de fallback');
-    profile = fallbackProfile;
-  } else {
-    console.log('✅ Perfil obtenido desde la API para hero');
-    profile = apiProfile;
-  }
+  profile = apiProfile || fallbackProfile;
 } catch (error) {
   console.error('❌ Error al obtener perfil para hero:', error);
   profile = fallbackProfile;

@@ -11,10 +11,7 @@ try {
   
   // Si no hay proyectos desde la API, usar datos de fallback
   if (!projects || projects.length === 0) {
-    console.log('⚠️ No se encontraron proyectos desde la API, usando datos de fallback');
     projects = fallbackProjects;
-  } else {
-    console.log(`✅ ${projects.length} proyectos obtenidos desde la API`);
   }
 } catch (error) {
   console.error('❌ Error al obtener proyectos:', error);

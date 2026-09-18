@@ -9,7 +9,6 @@ async function triggerVercelDeployHook() {
   }
 
   try {
-    console.log('🚀 Disparando Vercel Deploy Hook para reconstruir el sitio...');
     await fetch(hookUrl, { method: 'POST' });
   } catch (err) {
     console.error('❌ Error al invocar Vercel Deploy Hook:', err);
