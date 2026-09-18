@@ -54,7 +54,7 @@ export function About({ bio }: AboutProps) {
         }}
       >
         <div style={{ width: '1px', height: '40px', background: 'linear-gradient(to bottom, #AAFF00, transparent)', opacity: 0.6 }} />
-        <p className="lbl-acid">About</p>
+        <h2 className="lbl-acid" style={{ margin: 0, fontSize: 'inherit', fontWeight: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit' }}>About</h2>
       </div>
 
       <div style={{ maxWidth: '980px', position: 'relative', zIndex: 1 }}>

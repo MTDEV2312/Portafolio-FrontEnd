@@ -73,6 +73,8 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     const mappedProjects: Project[] = staticProjects.map((preset) => {
       const matchConfig = PRESET_KEYWORDS.find((k) => k.id === preset.id);
       const dbMatch = dbList.find((dbItem) => {
+        if (matchedDbIds.has(dbItem.id)) return false;
+        if (preset.supabaseId && dbItem.id === preset.supabaseId) return true;
         const titleLower = (dbItem.title || '').toLowerCase();
         return matchConfig?.keys.some((key) => titleLower.includes(key));
       });
@@ -87,6 +89,8 @@ export async function getPortfolioData(): Promise<PortfolioData> {
 
       return {
         ...preset,
+        title: dbMatch.title || preset.title,
+        shortTitle: dbMatch.title || preset.shortTitle,
         description: dbMatch.description || preset.description,
         technologies: parsedTech.length > 0 ? parsedTech : preset.technologies,
         image: dbMatch.image_src || preset.image,

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Header } from './Header';
 import { Hero } from './Hero';
 import { ProgressIndicator } from './ProgressIndicator';
@@ -9,8 +9,6 @@ import { Contact } from './Contact';
 import { Footer } from './Footer';
 import { projects as defaultProjects, type Project } from '../../data/projects';
 import type { Profile } from '../../services/api';
-import { supabase } from '../../services/supabase';
-import { getPortfolioData } from '../../services/portfolioService';
 
 interface AppProps {
   initialProjects?: Project[];
@@ -18,49 +16,14 @@ interface AppProps {
 }
 
 export default function App({ initialProjects, profile }: AppProps) {
-  const [projectList, setProjectList] = useState<Project[]>(
+  const [projectList] = useState<Project[]>(
     initialProjects && initialProjects.length > 0 ? initialProjects : defaultProjects
   );
-  const [currentProfile, setCurrentProfile] = useState<Profile | undefined>(profile);
+  const [currentProfile] = useState<Profile | undefined>(profile);
   const [activeProjectId, setActiveProjectId] = useState(0);
 
   const handleProjectActive = useCallback((id: number) => {
     setActiveProjectId(id);
-  }, []);
-
-  // Realtime synchronization with Supabase when changes are committed in /admin
-  useEffect(() => {
-    const channel = supabase
-      .channel('portfolio-live-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'proyectos' },
-        async () => {
-          try {
-            const data = await getPortfolioData();
-            setProjectList(data.projects);
-          } catch (e) {
-            console.error('Error updating live projects:', e);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'presentador' },
-        async () => {
-          try {
-            const data = await getPortfolioData();
-            setCurrentProfile(data.profile);
-          } catch (e) {
-            console.error('Error updating live profile:', e);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   return (
@@ -77,6 +40,7 @@ export default function App({ initialProjects, profile }: AppProps) {
         <ProjectScene
           key={project.id}
           project={project}
+          totalProjects={projectList.length}
           onActive={handleProjectActive}
         />
       ))}
