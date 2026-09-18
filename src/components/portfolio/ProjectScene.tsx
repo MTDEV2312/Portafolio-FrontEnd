@@ -1,6 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { Project } from '../../data/projects';
-import { useIsMobile } from '../../hooks/useIsMobile';
 import { useScrollRatio } from '../../hooks/useScrollRatio';
 
 // ─────────────────────────────────────────────
@@ -70,6 +69,7 @@ function ActionLinks({
         alignItems: 'center',
         gap: '20px',
         marginTop: '18px',
+        flexWrap: 'wrap',
         ...style,
       }}
     >
@@ -79,7 +79,7 @@ function ActionLinks({
           target="_blank"
           rel="noopener noreferrer"
           className="acid-link"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minHeight: '44px', padding: '6px 0' }}
         >
           <span>LIVE DEMO</span>
           <span aria-hidden style={{ fontSize: '10px', lineHeight: 1 }}>↗</span>
@@ -91,7 +91,7 @@ function ActionLinks({
           target="_blank"
           rel="noopener noreferrer"
           className="acid-link"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minHeight: '44px', padding: '6px 0' }}
         >
           <span>SOURCE CODE</span>
           <span aria-hidden style={{ fontSize: '10px', lineHeight: 1 }}>↗</span>
@@ -1290,65 +1290,79 @@ function MobileLayout({ p }: { p: Project }) {
     <div
       style={{
         width: '100%',
-        minHeight: '100vh',
-        padding: '88px 24px 64px',
+        minHeight: '100svh',
+        padding: 'clamp(80px, 12vw, 100px) clamp(20px, 5.5vw, 40px) 60px',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
       }}
     >
-      <p className="lbl-acid" style={{ marginBottom: '10px' }}>{p.num}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+        <p className="lbl-acid" style={{ margin: 0 }}>{p.num}</p>
+        <span style={{ color: 'rgba(241,237,230,0.2)', fontSize: '10px' }}>/</span>
+        <p className="lbl-mono" style={{ margin: 0, fontSize: '9px' }}>{p.category}</p>
+      </div>
+
       <h2
         style={{
           fontFamily: "'Bricolage Grotesque', sans-serif",
           fontWeight: 800,
-          fontSize: 'clamp(38px, 10.5vw, 64px)',
-          lineHeight: 0.9,
-          letterSpacing: '-0.034em',
+          fontSize: 'clamp(28px, 8.5vw, 54px)',
+          lineHeight: 0.95,
+          letterSpacing: '-0.03em',
           color: '#F1EDE6',
           whiteSpace: 'pre-line',
           textTransform: 'uppercase',
-          marginBottom: '12px',
+          marginBottom: '20px',
+          wordBreak: 'break-word',
         }}
       >
         {p.shortTitle || p.title}
       </h2>
-      <p className="lbl-mono" style={{ marginBottom: '24px' }}>{p.category}</p>
 
       {/* Visual element */}
       <div
         style={{
-          height: isCinema ? 'auto' : '220px',
+          width: '100%',
+          height: isCinema ? 'auto' : 'clamp(200px, 48vw, 320px)',
           marginBottom: '24px',
           overflow: 'hidden',
           position: 'relative',
-          border: isApi || isAr ? '1px solid rgba(241,237,230,0.07)' : 'none',
+          borderRadius: '4px',
+          border: isApi || isAr ? '1px solid rgba(241,237,230,0.08)' : '1px solid rgba(241,237,230,0.05)',
+          background: '#0E0D0C',
         }}
       >
         {isAr ? (
-          <div style={{ height: '220px' }}><ArViz /></div>
+          <div style={{ height: '100%', minHeight: '220px' }}><ArViz /></div>
         ) : isApi ? (
-          <div style={{ height: '220px' }}><ApiPanel /></div>
+          <div style={{ height: '100%', minHeight: '220px', overflowY: 'auto' }}><ApiPanel /></div>
         ) : isCinema ? (
-          <div style={{ padding: '20px 0' }}><SeatGrid /></div>
+          <div style={{ padding: '20px 0', overflowX: 'auto' }}><SeatGrid /></div>
         ) : (
-          <div className="img-wrap" style={{ height: '220px' }}>
-            <div className="par-img">
-              <img
-                src={p.image}
-                alt={p.imageAlt}
-                loading={p.id === 1 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
-            </div>
+          <div className="img-wrap" style={{ height: '100%', width: '100%', minHeight: '200px' }}>
+            <img
+              src={p.image}
+              alt={p.imageAlt}
+              loading={p.id === 1 ? 'eager' : 'lazy'}
+              decoding="async"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
           </div>
         )}
       </div>
 
-      <Desc text={p.description} maxWidth="none" />
+      <Desc text={p.description} maxWidth="100%" />
 
       {isTicket && (
-        <div style={{ marginTop: '20px', overflowX: 'auto' }}>
+        <div style={{ marginTop: '20px', marginBottom: '12px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '8px' }}>
           <TicketFlow />
         </div>
       )}
@@ -1371,7 +1385,6 @@ interface Props {
 
 export function ProjectScene({ project: p, totalProjects, onActive }: Props) {
   const ref = useRef<HTMLElement>(null);
-  const isMobile = useIsMobile();
 
   // Continuous scroll ratio → CSS custom property on section
   useScrollRatio(ref);
@@ -1412,20 +1425,19 @@ export function ProjectScene({ project: p, totalProjects, onActive }: Props) {
       className="project-scene section-border"
       style={{ position: 'relative', overflow: 'hidden' }}
     >
-      {isMobile ? (
+      <div className="project-desktop hide-mobile">
+        {p.layout === 'A' && <LayoutA p={p} totalProjects={totalProjects} />}
+        {p.layout === 'B' && <LayoutB p={p} />}
+        {p.layout === 'C' && <LayoutC p={p} />}
+        {p.layout === 'D' && <LayoutD p={p} />}
+        {p.layout === 'E' && <LayoutE p={p} />}
+        {p.layout === 'F' && <LayoutF p={p} />}
+        {p.layout === 'G' && <LayoutG p={p} />}
+        {p.layout === 'H' && <LayoutH p={p} />}
+      </div>
+      <div className="project-mobile show-mobile">
         <MobileLayout p={p} />
-      ) : (
-        <>
-          {p.layout === 'A' && <LayoutA p={p} totalProjects={totalProjects} />}
-          {p.layout === 'B' && <LayoutB p={p} />}
-          {p.layout === 'C' && <LayoutC p={p} />}
-          {p.layout === 'D' && <LayoutD p={p} />}
-          {p.layout === 'E' && <LayoutE p={p} />}
-          {p.layout === 'F' && <LayoutF p={p} />}
-          {p.layout === 'G' && <LayoutG p={p} />}
-          {p.layout === 'H' && <LayoutH p={p} />}
-        </>
-      )}
+      </div>
     </section>
   );
 }

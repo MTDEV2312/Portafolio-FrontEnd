@@ -45,8 +45,8 @@ export function useScrollRatio(ref: React.RefObject<HTMLElement | null>) {
     const el = ref.current;
     if (!el) return;
 
-    // Respect reduced motion preference
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Respect reduced motion preference or mobile viewports (where parallax is disabled in CSS)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.innerWidth <= 1024) {
       el.style.setProperty('--sr', '0.5');
       el.style.setProperty('--so', '1');
       return;

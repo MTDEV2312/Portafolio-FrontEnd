@@ -1,20 +1,15 @@
-import { useIsMobile } from '../../hooks/useIsMobile';
-
 interface AboutProps {
   bio?: string;
 }
 
 export function About({ bio }: AboutProps) {
-  const isMobile = useIsMobile();
-  const pad = isMobile ? '96px 24px 80px' : '140px 80px';
-
   return (
     <section
       id="about"
       className="section-border"
       style={{
-        minHeight: '100vh',
-        padding: pad,
+        minHeight: '100svh',
+        padding: 'clamp(80px, 12vw, 140px) clamp(20px, 5.5vw, 80px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -27,16 +22,18 @@ export function About({ bio }: AboutProps) {
         aria-hidden
         style={{
           position: 'absolute',
-          right: isMobile ? '-12px' : '-36px',
+          right: 'clamp(-10px, 2vw, 20px)',
           top: '16px',
           fontFamily: "'Bricolage Grotesque', sans-serif",
           fontWeight: 800,
-          fontSize: isMobile ? '22vw' : 'clamp(130px, 20vw, 300px)',
+          fontSize: 'clamp(60px, 18vw, 240px)',
           lineHeight: 1,
           letterSpacing: '-0.055em',
           color: 'rgba(241,237,230,0.028)',
           userSelect: 'none',
           pointerEvents: 'none',
+          maxWidth: '100%',
+          overflow: 'hidden',
         }}
       >
         ABOUT
@@ -48,7 +45,7 @@ export function About({ bio }: AboutProps) {
           display: 'flex',
           alignItems: 'center',
           gap: '14px',
-          marginBottom: isMobile ? '40px' : '56px',
+          marginBottom: 'clamp(32px, 4.5vw, 56px)',
           position: 'relative',
           zIndex: 1,
         }}
@@ -63,10 +60,8 @@ export function About({ bio }: AboutProps) {
           style={{
             fontFamily: "'Bricolage Grotesque', sans-serif",
             fontWeight: 600,
-            fontSize: isMobile
-              ? 'clamp(22px, 6.5vw, 36px)'
-              : 'clamp(28px, 3.6vw, 56px)',
-            lineHeight: 1.15,
+            fontSize: 'clamp(22px, 4vw, 50px)',
+            lineHeight: 1.18,
             letterSpacing: '-0.025em',
             color: '#F1EDE6',
           }}
@@ -87,7 +82,7 @@ export function About({ bio }: AboutProps) {
             width: '44px',
             height: '1px',
             background: 'rgba(241,237,230,0.13)',
-            margin: isMobile ? '36px 0' : '52px 0',
+            margin: 'clamp(28px, 4vw, 52px) 0',
           }}
         />
 
@@ -95,10 +90,10 @@ export function About({ bio }: AboutProps) {
           style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 300,
-            fontSize: isMobile ? '15px' : 'clamp(15px, 1.6vw, 21px)',
+            fontSize: 'clamp(14px, 1.6vw, 19px)',
             lineHeight: 1.76,
             color: 'rgba(241,237,230,0.43)',
-            maxWidth: '600px',
+            maxWidth: 'min(600px, 100%)',
           }}
         >
           I enjoy working across the stack — from interactive interfaces and
@@ -110,8 +105,8 @@ export function About({ bio }: AboutProps) {
       <div
         style={{
           position: 'absolute',
-          bottom: isMobile ? '28px' : '44px',
-          right: isMobile ? '24px' : '80px',
+          bottom: 'clamp(24px, 4vw, 44px)',
+          right: 'clamp(20px, 5.5vw, 80px)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',

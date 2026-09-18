@@ -1,12 +1,8 @@
-import { useIsMobile } from '../../hooks/useIsMobile';
-
 interface ContactProps {
   email?: string;
 }
 
 export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
-  const isMobile = useIsMobile();
-
   const links = [
     { label: 'Email', value: email, href: `mailto:${email}` },
     { label: 'GitHub', value: 'github.com/MTDEV2312', href: 'https://github.com/MTDEV2312' },
@@ -18,8 +14,8 @@ export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
       id="contact"
       className="section-border"
       style={{
-        minHeight: '100vh',
-        padding: isMobile ? '96px 24px 80px' : '120px 80px',
+        minHeight: '100svh',
+        padding: 'clamp(80px, 12vw, 120px) clamp(20px, 5.5vw, 80px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -33,21 +29,23 @@ export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
         style={{
           position: 'absolute',
           bottom: '16px',
-          left: isMobile ? '24px' : '80px',
+          left: 'clamp(20px, 5.5vw, 80px)',
           fontFamily: "'Bricolage Grotesque', sans-serif",
           fontWeight: 800,
-          fontSize: isMobile ? '20vw' : 'clamp(80px, 14.5vw, 210px)',
+          fontSize: 'clamp(46px, 14vw, 180px)',
           lineHeight: 0.88,
           letterSpacing: '-0.055em',
           color: 'rgba(241,237,230,0.022)',
           userSelect: 'none',
           pointerEvents: 'none',
+          maxWidth: '100%',
+          overflow: 'hidden',
         }}
       >
         CONTACT
       </div>
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '960px' }}>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '960px', width: '100%' }}>
         {/* Section marker */}
         <div
           style={{
@@ -72,14 +70,13 @@ export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
           style={{
             fontFamily: "'Bricolage Grotesque', sans-serif",
             fontWeight: 800,
-            fontSize: isMobile
-              ? 'clamp(42px, 12vw, 78px)'
-              : 'clamp(58px, 8.5vw, 136px)',
-            lineHeight: 0.86,
-            letterSpacing: '-0.042em',
+            fontSize: 'clamp(36px, 9vw, 120px)',
+            lineHeight: 0.88,
+            letterSpacing: '-0.04em',
             color: '#F1EDE6',
             textTransform: 'uppercase',
-            marginBottom: isMobile ? '28px' : '36px',
+            marginBottom: 'clamp(20px, 3.5vw, 36px)',
+            wordBreak: 'break-word',
           }}
         >
           LET'S BUILD
@@ -93,37 +90,21 @@ export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
             fontWeight: 300,
             fontSize: '15px',
             color: 'rgba(241,237,230,0.4)',
-            marginBottom: isMobile ? '44px' : '60px',
+            marginBottom: 'clamp(32px, 4.5vw, 60px)',
           }}
         >
           Have a project, idea or opportunity?
         </p>
 
         {/* Contact rows */}
-        <div>
-          {links.map((link, i) => (
+        <div style={{ width: '100%' }}>
+          {links.map((link) => (
             <a
               key={link.label}
               href={link.href}
               target={link.href.startsWith('http') ? '_blank' : undefined}
               rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              style={{
-                display: 'flex',
-                alignItems: isMobile ? 'flex-start' : 'baseline',
-                flexDirection: isMobile ? 'column' : 'row',
-                gap: isMobile ? '4px' : '24px',
-                textDecoration: 'none',
-                borderBottom: '1px solid rgba(241,237,230,0.055)',
-                borderTop: i === 0 ? '1px solid rgba(241,237,230,0.055)' : 'none',
-                padding: isMobile ? '18px 0' : '22px 0',
-                transition: 'border-color 0.25s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderBottomColor = 'rgba(170,255,0,0.25)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderBottomColor = 'rgba(241,237,230,0.055)';
-              }}
+              className="contact-row"
             >
               <span
                 className="lbl-mono"
@@ -131,17 +112,7 @@ export function Contact({ email = 'agusmaty.a23@gmail.com' }: ContactProps) {
               >
                 {link.label.toUpperCase()}
               </span>
-              <span
-                style={{
-                  fontFamily: "'Bricolage Grotesque', sans-serif",
-                  fontWeight: 500,
-                  fontSize: isMobile
-                    ? 'clamp(14px, 4vw, 20px)'
-                    : 'clamp(17px, 2.3vw, 34px)',
-                  color: '#F1EDE6',
-                  letterSpacing: '-0.01em',
-                }}
-              >
+              <span className="contact-row-value">
                 {link.value}
               </span>
             </a>
