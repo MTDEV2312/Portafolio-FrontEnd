@@ -18,7 +18,7 @@ html {
   scroll-behavior: smooth;
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -27,7 +27,7 @@ body {
   font-family: 'Inter', sans-serif;
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -388,7 +388,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 2px;
+  padding: 8px 3px;
   display: flex;
   align-items: center;
 }
@@ -419,10 +419,17 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 3px 0;
+  padding: 4px 2px;
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: transform 0.2s ease;
+}
+.progress-desktop-btn:hover .progress-dot-label {
+  color: rgba(241, 237, 230, 0.6);
+}
+.progress-desktop-btn:hover .progress-desktop-bar {
+  background: rgba(170, 255, 0, 0.6);
 }
 .progress-desktop-bar {
   width: 4px;

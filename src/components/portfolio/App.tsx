@@ -27,9 +27,9 @@ export default function App({ initialProjects, profile }: AppProps) {
   }, []);
 
   return (
-    <div style={{ background: '#0A0909', minHeight: '100vh', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+    <div style={{ background: '#0A0909', minHeight: '100vh', width: '100%', maxWidth: '100vw', overflowX: 'clip' }}>
       <Header name={currentProfile?.nombre} />
-      <ProgressIndicator projects={projectList} activeId={activeProjectId} />
+      <ProgressIndicator projects={projectList} activeId={activeProjectId} onSelect={handleProjectActive} />
 
       <Hero
         name={currentProfile?.nombre}

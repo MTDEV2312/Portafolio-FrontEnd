@@ -1399,10 +1399,10 @@ export function ProjectScene({ project: p, totalProjects, onActive }: Props) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const { intersectionRatio, boundingClientRect } = entry;
+        const { isIntersecting, boundingClientRect } = entry;
         el.classList.remove('state-entering', 'state-active', 'state-exiting');
 
-        if (intersectionRatio > 0.4) {
+        if (isIntersecting) {
           el.classList.add('state-active');
           handleActive(p.id);
         } else if (boundingClientRect.top > 0) {
@@ -1411,7 +1411,10 @@ export function ProjectScene({ project: p, totalProjects, onActive }: Props) {
           el.classList.add('state-exiting');
         }
       },
-      { threshold: [0, 0.08, 0.2, 0.4, 0.6, 0.8, 1] },
+      {
+        rootMargin: '-30% 0px -30% 0px',
+        threshold: 0,
+      },
     );
 
     observer.observe(el);
