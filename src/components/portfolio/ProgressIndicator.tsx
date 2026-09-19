@@ -3,11 +3,17 @@ import { projects as fallbackProjects, type Project } from '../../data/projects'
 interface Props {
   projects?: Project[];
   activeId: number;
+  onSelect?: (id: number) => void;
 }
 
-export function ProgressIndicator({ projects = fallbackProjects, activeId }: Props) {
-  const scrollTo = (num: string) => {
-    document.getElementById(`project-${num}`)?.scrollIntoView({ behavior: 'smooth' });
+export function ProgressIndicator({ projects = fallbackProjects, activeId, onSelect }: Props) {
+  const scrollTo = (num: string, id: number) => {
+    onSelect?.(id);
+    const el = document.getElementById(`project-${num}`);
+    if (el) {
+      const targetTop = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: targetTop, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -22,7 +28,7 @@ export function ProgressIndicator({ projects = fallbackProjects, activeId }: Pro
           return (
             <button
               key={p.id}
-              onClick={() => scrollTo(p.num)}
+              onClick={() => scrollTo(p.num, p.id)}
               title={p.title}
               aria-label={`Proyecto ${p.num}: ${p.title}`}
               className="progress-mobile-dot"
@@ -43,7 +49,7 @@ export function ProgressIndicator({ projects = fallbackProjects, activeId }: Pro
           return (
             <button
               key={p.id}
-              onClick={() => scrollTo(p.num)}
+              onClick={() => scrollTo(p.num, p.id)}
               title={p.title}
               aria-label={`Proyecto ${p.num}: ${p.title}`}
               className="progress-desktop-btn"
