@@ -67,62 +67,56 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     }
 
     const dbList = projectsRes.data;
-    const matchedDbIds = new Set<string>();
+    const matchedPresetIds = new Set<number>();
 
-    // Merge DB data into the 13 editorial presets
-    const mappedProjects: Project[] = staticProjects.map((preset) => {
-      const matchConfig = PRESET_KEYWORDS.find((k) => k.id === preset.id);
-      const dbMatch = dbList.find((dbItem) => {
-        if (matchedDbIds.has(dbItem.id)) return false;
-        if (preset.supabaseId && dbItem.id === preset.supabaseId) return true;
+    // Map exclusively the projects returned by Supabase, enriching with editorial presets when matched
+    const mappedProjects: Project[] = dbList.map((dbItem, index) => {
+      const indexNumber = index + 1;
+      const numStr = String(indexNumber).padStart(2, '0');
+      const parsedTech = formatTechnologies(dbItem.techSection || dbItem.tech_section);
+
+      const preset = staticProjects.find((p) => {
+        if (matchedPresetIds.has(p.id)) return false;
+        if (p.supabaseId && dbItem.id === p.supabaseId) return true;
+        const matchConfig = PRESET_KEYWORDS.find((k) => k.id === p.id);
         const titleLower = (dbItem.title || '').toLowerCase();
         return matchConfig?.keys.some((key) => titleLower.includes(key));
       });
 
-      if (!dbMatch) {
-        return preset;
+      if (preset) {
+        matchedPresetIds.add(preset.id);
+        return {
+          ...preset,
+          num: numStr,
+          title: dbItem.title || preset.title,
+          shortTitle: dbItem.title || preset.shortTitle,
+          description: dbItem.description || preset.description,
+          technologies: parsedTech.length > 0 ? parsedTech : preset.technologies,
+          image: dbItem.image_src || preset.image,
+          imageAlt: dbItem.image_alt || dbItem.title || preset.imageAlt,
+          githubLink: dbItem.github_link || undefined,
+          liveDemoLink: dbItem.live_demo_link || undefined,
+          supabaseId: dbItem.id,
+        };
       }
 
-      matchedDbIds.add(dbMatch.id);
-
-      const parsedTech = formatTechnologies(dbMatch.techSection || dbMatch.tech_section);
-
       return {
-        ...preset,
-        title: dbMatch.title || preset.title,
-        shortTitle: dbMatch.title || preset.shortTitle,
-        description: dbMatch.description || preset.description,
-        technologies: parsedTech.length > 0 ? parsedTech : preset.technologies,
-        image: dbMatch.image_src || preset.image,
-        imageAlt: dbMatch.image_alt || dbMatch.title || preset.imageAlt,
-        githubLink: dbMatch.github_link || undefined,
-        liveDemoLink: dbMatch.live_demo_link || undefined,
-        supabaseId: dbMatch.id,
-      };
-    });
-
-    // Append any extra projects created via Admin that don't belong to the initial 13
-    const extraProjects = dbList.filter((dbItem) => !matchedDbIds.has(dbItem.id));
-    extraProjects.forEach((extra) => {
-      const indexNumber = mappedProjects.length + 1;
-      const numStr = String(indexNumber).padStart(2, '0');
-      const parsedTech = formatTechnologies(extra.techSection || extra.tech_section);
-
-      mappedProjects.push({
-        id: indexNumber,
+        id: 1000 + indexNumber,
         num: numStr,
-        title: extra.title || `Proyecto ${numStr}`,
-        shortTitle: extra.title || `Proyecto ${numStr}`,
+        title: dbItem.title || `Project ${numStr}`,
+        shortTitle: dbItem.title || `Project ${numStr}`,
         category: 'FULLSTACK / PROJECT',
-        description: extra.description || '',
+        description: dbItem.description || '',
         technologies: parsedTech.length > 0 ? parsedTech : ['Fullstack'],
-        image: extra.image_src || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1400&h=900&fit=crop&auto=format',
-        imageAlt: extra.image_alt || extra.title || `Project ${numStr}`,
+        image:
+          dbItem.image_src ||
+          'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1400&h=900&fit=crop&auto=format',
+        imageAlt: dbItem.image_alt || dbItem.title || `Project ${numStr}`,
         layout: CYCLIC_LAYOUTS[(indexNumber - 1) % CYCLIC_LAYOUTS.length],
-        githubLink: extra.github_link || undefined,
-        liveDemoLink: extra.live_demo_link || undefined,
-        supabaseId: extra.id,
-      });
+        githubLink: dbItem.github_link || undefined,
+        liveDemoLink: dbItem.live_demo_link || undefined,
+        supabaseId: dbItem.id,
+      };
     });
 
     return {
